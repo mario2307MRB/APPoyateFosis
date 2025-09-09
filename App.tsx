@@ -1,20 +1,19 @@
-
 import React, { useState } from 'react';
 import useLocalStorage from './hooks/useLocalStorage';
 import type { User, AppView } from './types';
 import Auth from './components/Auth';
 import Welcome from './components/Welcome';
-import ProjectsView from './components/Projects';
+import ProjectsView from './components/projects/ProjectsView';
 import QuizView from './components/Quiz';
 import TaskManagerView from './components/TaskManager';
 import ConsultationView from './components/Consultation';
 import { LogOutIcon } from './components/Icons';
 
-const NavButton: React.FC<{
+const NavButton = React.memo<{
   label: string;
   isActive: boolean;
   onClick: () => void;
-}> = ({ label, isActive, onClick }) => (
+}>(({ label, isActive, onClick }) => (
   <button
     onClick={onClick}
     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -25,7 +24,7 @@ const NavButton: React.FC<{
   >
     {label}
   </button>
-);
+));
 
 
 const App: React.FC = () => {
@@ -59,7 +58,7 @@ const App: React.FC = () => {
     };
     
     return (
-        <div className="min-h-screen flex flex-col bg-slate-100">
+        <div className="min-h-screen flex flex-col">
             <header className="bg-fosis-blue shadow-md sticky top-0 z-40">
                 <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">

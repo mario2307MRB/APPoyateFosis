@@ -1,15 +1,14 @@
-
 import { GoogleGenAI } from "@google/genai";
 
-if (!process.env.API_KEY) {
-  console.warn("API_KEY environment variable not set. Gemini features will not work.");
-}
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+// Per coding guidelines, the GoogleGenAI client must be initialized with process.env.API_KEY.
+// The deployment environment is expected to provide this variable.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const getFosisAnswer = async (prompt: string): Promise<string> => {
+  // Although the guidelines assume the API key is always present, this check
+  // provides a better user experience than a generic error if it's missing.
   if (!process.env.API_KEY) {
-    return "Error: La clave de API de Gemini no está configurada. Por favor, configure la variable de entorno API_KEY.";
+    return "Error: La clave de API de Gemini no está configurada. Por favor, contacte al administrador del sistema.";
   }
 
   try {
