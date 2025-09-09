@@ -62,26 +62,26 @@ export interface QuizQuestion {
   correctAnswer: string;
 }
 
-export enum TaskPriority {
-  High = 'Alta',
-  Medium = 'Media',
-  Low = 'Baja',
-}
-
-export enum TaskStatus {
-    ToDo = 'Por Hacer',
-    InProgress = 'En Progreso',
-    Done = 'Hecho'
-}
-
 export interface Task {
   id: string;
   title: string;
-  priority: TaskPriority;
-  deadlineDays: number;
-  status: TaskStatus;
-  createdAt: string;
+  durationHours: number;
 }
+
+export interface DaySchedule {
+  dayName: string;
+  capacity: number;
+  tasks: Task[];
+  usedHours: number;
+}
+
+export interface WeekSchedule {
+  weekNumber: number;
+  days: DaySchedule[];
+}
+
+export type Schedule = WeekSchedule[];
+
 
 export interface FosisTip {
     id: number;

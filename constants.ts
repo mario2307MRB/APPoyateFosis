@@ -1,6 +1,30 @@
 
 import type { QuizQuestion, FosisTip } from './types';
 
+export const FOSIS_TASKS_POOL = [
+  { title: "Revisar rendición de cuentas de proyecto 'Emprende Local'", durationHours: 3 },
+  { title: "Preparar informe de avance semanal para la dirección", durationHours: 4 },
+  { title: "Visita a terreno de supervisión al proyecto 'Mi Barrio'", durationHours: 6 },
+  { title: "Capacitación a usuarios del programa 'Yo Trabajo'", durationHours: 8 },
+  { title: "Responder correos y consultas administrativas", durationHours: 2 },
+  { title: "Planificar actividades de la próxima semana", durationHours: 3 },
+  { title: "Reunión de coordinación con equipo regional", durationHours: 2 },
+  { title: "Elaborar bases técnicas para licitación de programa 'Acción'", durationHours: 8 },
+  { title: "Evaluar 5 postulaciones de nuevos proyectos 'Innovación Social'", durationHours: 5 },
+  { title: "Digitalizar expedientes de 3 convenios finalizados", durationHours: 4 },
+  { title: "Asistir a reunión de coordinación intersectorial (Municipio)", durationHours: 3 },
+  { title: "Realizar seguimiento telefónico a 10 usuarios", durationHours: 2 },
+  { title: "Análisis de admisibilidad de nuevas propuestas", durationHours: 7 },
+  { title: "Preparar presentación de resultados trimestrales", durationHours: 5 },
+  { title: "Actualizar sistema de gestión de proyectos (SIGE)", durationHours: 2 },
+  { title: "Taller de cierre con participantes de 'Apoyo Familiar'", durationHours: 6 },
+  { title: "Revisión de presupuesto y flujo de caja de un proyecto", durationHours: 3 },
+  { title: "Elaborar acta de reunión de equipo", durationHours: 1 },
+  { title: "Sistematizar resultados de encuesta de satisfacción", durationHours: 4 },
+  { title: "Gestionar compra de insumos para capacitación", durationHours: 2 },
+];
+
+
 export const FOSIS_TIPS: FosisTip[] = [
     {
         id: 1,
