@@ -45,21 +45,21 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     };
 
     return (
-        <div className="min-h-screen bg-fosis-blue flex flex-col items-center justify-center p-4">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
-                <img src="https://www.fosis.gob.cl/assets/img/logo_main.png" alt="Logo FOSIS" className="mx-auto h-16 mb-6"/>
-                <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">
+        <div className="min-h-screen bg-neutral-100 flex flex-col items-center justify-center p-4">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 transition-all">
+                <img src="https://www.fosis.gob.cl/assets/img/logo_main.png" alt="Logo FOSIS" className="mx-auto h-20 mb-6"/>
+                <h2 className="text-3xl font-bold text-center text-neutral-800 mb-2">
                     {isLoginView ? 'Iniciar Sesión' : 'Crear Cuenta'}
                 </h2>
-                <p className="text-center text-gray-500 mb-6">
-                    {isLoginView ? 'Bienvenido de vuelta' : 'Únete a la plataforma'}
+                <p className="text-center text-neutral-500 mb-8">
+                    {isLoginView ? 'Bienvenido de vuelta a tu gestor de proyectos.' : 'Únete a la plataforma para comenzar.'}
                 </p>
 
-                {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4" role="alert">{error}</div>}
+                {error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg relative mb-6" role="alert">{error}</div>}
 
-                <form onSubmit={isLoginView ? handleLogin : handleRegister}>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                <form onSubmit={isLoginView ? handleLogin : handleRegister} className="space-y-6">
+                    <div>
+                        <label className="block text-neutral-700 text-sm font-bold mb-2" htmlFor="email">
                             Correo Electrónico
                         </label>
                         <input
@@ -67,12 +67,12 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-fosis-blue"
+                            className="shadow-sm appearance-none border border-neutral-300 rounded-lg w-full py-3 px-4 text-neutral-700 leading-tight focus:outline-none focus:ring-2 focus:ring-fosis-blue transition-shadow"
                             required
                         />
                     </div>
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                    <div>
+                        <label className="block text-neutral-700 text-sm font-bold mb-2" htmlFor="password">
                             Contraseña
                         </label>
                         <input
@@ -80,13 +80,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-fosis-blue"
+                            className="shadow-sm appearance-none border border-neutral-300 rounded-lg w-full py-3 px-4 text-neutral-700 leading-tight focus:outline-none focus:ring-2 focus:ring-fosis-blue transition-shadow"
                             required
                         />
                     </div>
                     {!isLoginView && (
-                        <div className="mb-6">
-                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">
+                        <div>
+                            <label className="block text-neutral-700 text-sm font-bold mb-2" htmlFor="confirmPassword">
                                 Confirmar Contraseña
                             </label>
                             <input
@@ -94,21 +94,21 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                                 type="password"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-fosis-blue"
+                                className="shadow-sm appearance-none border border-neutral-300 rounded-lg w-full py-3 px-4 text-neutral-700 leading-tight focus:outline-none focus:ring-2 focus:ring-fosis-blue transition-shadow"
                                 required
                             />
                         </div>
                     )}
-                    <div className="flex items-center justify-between">
-                        <button className="bg-fosis-blue hover:bg-fosis-blue-dark text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline w-full" type="submit">
+                    <div className="flex items-center justify-between pt-2">
+                        <button className="bg-fosis-blue hover:bg-fosis-blue-dark text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline w-full transition-transform transform hover:scale-105 shadow-lg hover:shadow-xl" type="submit">
                             {isLoginView ? 'Ingresar' : 'Registrarse'}
                         </button>
                     </div>
                 </form>
 
-                <p className="text-center text-gray-500 text-sm mt-6">
+                <p className="text-center text-neutral-500 text-sm mt-8">
                     {isLoginView ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}
-                    <button onClick={() => { setIsLoginView(!isLoginView); setError(''); }} className="font-bold text-fosis-blue hover:text-fosis-blue-dark ml-2">
+                    <button onClick={() => { setIsLoginView(!isLoginView); setError(''); }} className="font-bold text-fosis-blue hover:text-fosis-blue-dark ml-2 transition-colors">
                         {isLoginView ? 'Regístrate' : 'Inicia Sesión'}
                     </button>
                 </p>

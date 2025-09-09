@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-    @apply bg-slate-100;
+@layer base {
+    body {
+        @apply bg-neutral-100 text-neutral-800 antialiased font-sans;
+    }
+    /* Custom scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        @apply bg-neutral-200;
+    }
+    ::-webkit-scrollbar-thumb {
+        @apply bg-neutral-400 rounded-full;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-neutral-500;
+    }
 }

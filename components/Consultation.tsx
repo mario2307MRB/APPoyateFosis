@@ -43,45 +43,45 @@ const ConsultationView: React.FC = () => {
 
     return (
         <div className="p-4 sm:p-6 lg:p-8 flex flex-col h-[calc(100vh-80px)] max-h-[calc(100vh-80px)]">
-            <h1 className="text-3xl font-bold text-gray-800 text-center mb-4">Consulta en Línea</h1>
-            <div className="flex-1 bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden">
-                <div className="flex-1 p-6 space-y-4 overflow-y-auto">
+            <h1 className="text-3xl font-bold text-neutral-800 text-center mb-4">Consulta en Línea con IA</h1>
+            <div className="flex-1 bg-white rounded-2xl shadow-xl border flex flex-col overflow-hidden">
+                <div className="flex-1 p-6 space-y-6 overflow-y-auto">
                     {messages.map((msg, index) => (
-                        <div key={index} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
-                            {msg.sender === 'bot' && <div className="w-8 h-8 rounded-full bg-fosis-blue flex items-center justify-center text-white flex-shrink-0"><BotIcon className="w-5 h-5"/></div>}
-                            <div className={`max-w-md p-3 rounded-lg ${msg.sender === 'user' ? 'bg-fosis-blue text-white' : 'bg-gray-200 text-gray-800'}`}>
+                        <div key={index} className={`flex items-start gap-4 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
+                            {msg.sender === 'bot' && <div className="w-10 h-10 rounded-full bg-fosis-blue flex items-center justify-center text-white flex-shrink-0 shadow-sm"><BotIcon className="w-6 h-6"/></div>}
+                            <div className={`max-w-xl p-4 rounded-2xl shadow-sm ${msg.sender === 'user' ? 'bg-fosis-blue text-white rounded-br-lg' : 'bg-neutral-200 text-neutral-800 rounded-bl-lg'}`}>
                                 <p className="whitespace-pre-wrap">{msg.text}</p>
                             </div>
-                            {msg.sender === 'user' && <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 flex-shrink-0"><UserIcon className="w-5 h-5"/></div>}
+                            {msg.sender === 'user' && <div className="w-10 h-10 rounded-full bg-neutral-300 flex items-center justify-center text-neutral-600 flex-shrink-0 shadow-sm"><UserIcon className="w-6 h-6"/></div>}
                         </div>
                     ))}
                     {isLoading && (
-                        <div className="flex items-start gap-3">
-                             <div className="w-8 h-8 rounded-full bg-fosis-blue flex items-center justify-center text-white flex-shrink-0"><BotIcon className="w-5 h-5"/></div>
-                             <div className="max-w-md p-3 rounded-lg bg-gray-200 text-gray-800 flex items-center gap-2">
-                                <span className="animate-pulse">Escribiendo...</span>
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+                        <div className="flex items-start gap-4">
+                             <div className="w-10 h-10 rounded-full bg-fosis-blue flex items-center justify-center text-white flex-shrink-0 shadow-sm"><BotIcon className="w-6 h-6"/></div>
+                             <div className="max-w-md p-4 rounded-2xl shadow-sm bg-neutral-200 text-neutral-800 flex items-center gap-2">
+                                <div className="w-2.5 h-2.5 bg-neutral-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                <div className="w-2.5 h-2.5 bg-neutral-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                <div className="w-2.5 h-2.5 bg-neutral-500 rounded-full animate-bounce"></div>
                              </div>
                         </div>
                     )}
                 </div>
-                <div className="p-4 bg-gray-100 border-t">
-                    <div className="flex items-center gap-2">
+                <div className="p-4 bg-neutral-100 border-t">
+                    <div className="flex items-center gap-3">
                         <input
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyPress={handleKeyPress}
                             placeholder="Escribe tu pregunta aquí..."
-                            className="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-fosis-blue"
+                            className="flex-1 p-3 border border-neutral-300 rounded-full focus:outline-none focus:ring-2 focus:ring-fosis-blue transition-shadow"
                             disabled={isLoading}
                         />
                         <button
                             onClick={handleSend}
                             disabled={isLoading || !input.trim()}
-                            className="p-3 bg-fosis-blue text-white rounded-full disabled:bg-gray-400 hover:bg-fosis-blue-dark transition-colors"
+                            className="p-3 bg-fosis-blue text-white rounded-full disabled:bg-neutral-400 hover:bg-fosis-blue-dark transition-all transform hover:scale-110 shadow-md"
+                            aria-label="Enviar mensaje"
                         >
                             <SendIcon className="w-6 h-6"/>
                         </button>
