@@ -1,0 +1,5 @@
+{
+  "name": "Gestor de Proyectos FOSIS",
+  "description": "Una aplicación integral para la gestión de proyectos FOSIS, incluyendo seguimiento, un quiz de conocimientos, un gestor de tareas y un asistente de consulta en línea.",
+  "requestFramePermissions": []
+}
