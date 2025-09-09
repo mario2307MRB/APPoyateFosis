@@ -62,10 +62,13 @@ export interface QuizQuestion {
   correctAnswer: string;
 }
 
+export type TaskPriority = 'Alta' | 'Media' | 'Baja';
+
 export interface Task {
   id: string;
   title: string;
   durationHours: number;
+  priority: TaskPriority;
 }
 
 export interface DaySchedule {

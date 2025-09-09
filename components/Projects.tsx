@@ -151,17 +151,19 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
     const addListItem = (listName: 'disbursements' | 'renditions' | 'supervisedUsers') => {
         if (listName === 'disbursements' && project.disbursements.length >= 3) return;
 
-        let newItem;
-        if (listName === 'supervisedUsers') {
-            newItem = { id: new Date().toISOString(), supervisionDate: '', name: '', commune: '', observation: '' };
-        } else {
-            newItem = { id: new Date().toISOString(), date: '', amount: 0, monthYear: '', approvedAmount: 0 };
-        }
-
-        setProject(prev => ({
-            ...prev,
-            [listName]: [...prev[listName], newItem]
-        }));
+        setProject(prev => {
+            if (listName === 'supervisedUsers') {
+                const newItem: SupervisedUser = { id: new Date().toISOString(), supervisionDate: '', name: '', commune: '', observation: '' };
+                return { ...prev, supervisedUsers: [...prev.supervisedUsers, newItem] };
+            }
+            if (listName === 'disbursements') {
+                const newItem: Disbursement = { id: new Date().toISOString(), date: '', amount: 0 };
+                return { ...prev, disbursements: [...prev.disbursements, newItem] };
+            }
+            // Must be renditions
+            const newItem: Rendition = { id: new Date().toISOString(), monthYear: '', approvedAmount: 0 };
+            return { ...prev, renditions: [...prev.renditions, newItem] };
+        });
     };
 
     const removeListItem = (listName: 'disbursements' | 'renditions' | 'supervisedUsers', index: number) => {
@@ -316,7 +318,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
                         <div className="md:col-span-2">
                             <h4 className="font-semibold text-gray-700">Desembolsos</h4>
                             {project.disbursements.map((d, i) => (
-                                <div key={i} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border rounded-md">
+                                <div key={d.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border rounded-md">
                                     <input type="date" value={d.date} onChange={e => handleListChange('disbursements', i, 'date', e.target.value)} className="w-full border rounded-md shadow-sm p-2 border-gray-300" />
                                     <input type="number" placeholder="Monto CLP" value={d.amount || ''} onChange={e => handleListChange('disbursements', i, 'amount', parseFloat(e.target.value) || 0)} className="w-full border rounded-md shadow-sm p-2 border-gray-300" />
                                     <button type="button" onClick={() => removeListItem('disbursements', i)} className="text-red-500 hover:text-red-700 justify-self-end"><TrashIcon className="w-5 h-5"/></button>
@@ -330,7 +332,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
                         <div className="md:col-span-2">
                             <h4 className="font-semibold text-gray-700 mt-4">Rendiciones Aprobadas</h4>
                              {project.renditions.map((r, i) => (
-                                <div key={i} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border rounded-md">
+                                <div key={r.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border rounded-md">
                                     <input type="month" placeholder="Mes/Año" value={r.monthYear} onChange={e => handleListChange('renditions', i, 'monthYear', e.target.value)} className="w-full border rounded-md shadow-sm p-2 border-gray-300" />
                                     <input type="number" placeholder="Monto Aprobado CLP" value={r.approvedAmount || ''} onChange={e => handleListChange('renditions', i, 'approvedAmount', parseFloat(e.target.value) || 0)} className="w-full border rounded-md shadow-sm p-2 border-gray-300" />
                                     <button type="button" onClick={() => removeListItem('renditions', i)} className="text-red-500 hover:text-red-700 justify-self-end"><TrashIcon className="w-5 h-5"/></button>
