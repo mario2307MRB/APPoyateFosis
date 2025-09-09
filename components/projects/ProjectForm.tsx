@@ -4,7 +4,7 @@ import type { Project, Disbursement, Rendition, SupervisedUser } from '../../typ
 import { TrashIcon, XCircleIcon } from '../Icons';
 
 // --- Helper Functions ---
-const formatDateForInput = (dateString: string) => {
+const formatDateForInput = (dateString?: string) => {
     if (!dateString) return '';
     if (dateString.length === 7) return dateString; // Handles month (YYYY-MM)
     return new Date(dateString).toISOString().split('T')[0];
@@ -123,7 +123,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
     };
     
     type ListName = 'disbursements' | 'renditions' | 'supervisedUsers';
-    type ListItem = Disbursement | Rendition | SupervisedUser;
 
     interface ListMap {
         disbursements: Disbursement;
@@ -145,17 +144,19 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
         if (listName === 'disbursements' && project.disbursements.length >= 3) return;
 
         setProject(prev => {
-            let newItem: ListItem;
             switch(listName) {
-                case 'disbursements':
-                    newItem = { id: crypto.randomUUID(), date: '', amount: 0 };
+                case 'disbursements': {
+                    const newItem: Disbursement = { id: crypto.randomUUID(), date: '', amount: 0 };
                     return { ...prev, disbursements: [...prev.disbursements, newItem] };
-                case 'renditions':
-                    newItem = { id: crypto.randomUUID(), monthYear: '', approvedAmount: 0 };
+                }
+                case 'renditions': {
+                    const newItem: Rendition = { id: crypto.randomUUID(), monthYear: '', approvedAmount: 0 };
                     return { ...prev, renditions: [...prev.renditions, newItem] };
-                case 'supervisedUsers':
-                    newItem = { id: crypto.randomUUID(), supervisionDate: '', name: '', commune: '', observation: '' };
+                }
+                case 'supervisedUsers': {
+                    const newItem: SupervisedUser = { id: crypto.randomUUID(), supervisionDate: '', name: '', commune: '', observation: '' };
                      return { ...prev, supervisedUsers: [...prev.supervisedUsers, newItem] };
+                }
                 default:
                     return prev;
             }
