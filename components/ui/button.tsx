@@ -47,9 +47,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        // FIX: The className prop should be passed to cn() for merging, not to buttonVariants().
-        // This corrects the properties passed to buttonVariants and resolves type errors.
-        className={cn(buttonVariants({ variant, size }), className)}
+        // FIX: The type inference issue is resolved by passing className directly into buttonVariants.
+        // This is a standard and robust pattern for cva that ensures props like 'variant' and 'size' are correctly typed.
+        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
       />
