@@ -131,3 +131,15 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
         correctAnswer: "Anticipo"
     }
 ];
+
+export const formatCurrency = (value: number) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(value);
+
+export const formatDate = (dateString?: string) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('es-CL', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC'
+    });
+};

@@ -16,14 +16,13 @@ const NavButton = React.memo<{
 }>(({ label, isActive, onClick }) => (
   <button
     onClick={onClick}
-    className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ease-in-out relative ${
+    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 relative ${
       isActive
-        ? 'text-white'
-        : 'text-neutral-300 hover:text-white'
+        ? 'bg-fosis-blue-800 text-white shadow-sm'
+        : 'text-slate-500 hover:text-fosis-blue-800 hover:bg-fosis-blue-100'
     }`}
   >
     {label}
-    {isActive && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-0.5 bg-fosis-green rounded-full"></span>}
   </button>
 ));
 
@@ -59,14 +58,14 @@ const App: React.FC = () => {
     };
     
     return (
-        <div className="min-h-screen flex flex-col bg-neutral-100">
-            <header className="bg-fosis-blue shadow-lg sticky top-0 z-40">
+        <div className="min-h-screen flex flex-col bg-slate-50">
+            <header className="bg-white/90 backdrop-blur-lg shadow-sm sticky top-0 z-40 border-b border-slate-200">
                 <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
                         <div className="flex items-center">
-                            <img src="https://www.fosis.gob.cl/assets/img/logo_header.png" alt="FOSIS Logo" className="h-12"/>
+                            <img src="https://www.fosis.gob.cl/assets/img/logo_main.png" alt="FOSIS Logo" className="h-10"/>
                             <div className="hidden md:block ml-10">
-                                <div className="flex items-baseline space-x-2">
+                                <div className="flex items-baseline space-x-2 bg-slate-100 p-1 rounded-full border border-slate-200">
                                    <NavButton label="Bienvenida" isActive={currentView === 'welcome'} onClick={() => setCurrentView('welcome')} />
                                    <NavButton label="Mis Proyectos" isActive={currentView === 'projects'} onClick={() => setCurrentView('projects')} />
                                    <NavButton label="Quiz" isActive={currentView === 'quiz'} onClick={() => setCurrentView('quiz')} />
@@ -75,9 +74,9 @@ const App: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex items-center">
-                             <span className="text-white text-sm mr-4 hidden sm:block font-medium">{currentUser.email}</span>
-                             <button onClick={handleLogout} className="p-2 rounded-full text-neutral-300 hover:bg-fosis-blue-dark hover:text-white transition-colors">
+                        <div className="flex items-center space-x-4">
+                             <span className="text-slate-600 text-sm mr-2 hidden sm:block font-medium">{currentUser.email}</span>
+                             <button onClick={handleLogout} className="p-2 rounded-full text-slate-500 hover:bg-red-100 hover:text-red-600 transition-colors">
                                 <LogOutIcon className="w-6 h-6"/>
                              </button>
                         </div>
@@ -87,13 +86,13 @@ const App: React.FC = () => {
             <main className="flex-grow">
                {renderView()}
             </main>
-            <footer className="bg-fosis-blue-dark text-neutral-300 shadow-inner mt-auto">
+            <footer className="bg-slate-100 text-slate-500 border-t border-slate-200">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm">
-                    <img src="https://www.fosis.gob.cl/assets/img/logo_header.png" alt="FOSIS Logo" className="h-10 mx-auto mb-4 opacity-80"/>
+                    <img src="https://www.fosis.gob.cl/assets/img/logo_main.png" alt="FOSIS Logo" className="h-8 mx-auto mb-4 opacity-70"/>
                     <p>&copy; {new Date().getFullYear()} Gestor de Proyectos FOSIS.</p>
-                    <p className="text-xs text-neutral-400 mt-1">Esta es una herramienta de apoyo no oficial.</p>
+                    <p className="text-xs text-slate-400 mt-1">Esta es una herramienta de apoyo no oficial.</p>
                     <p className="mt-3">
-                        <a href="https://www.fosis.gob.cl/" target="_blank" rel="noopener noreferrer" className="font-semibold text-white hover:underline">
+                        <a href="https://www.fosis.gob.cl/" target="_blank" rel="noopener noreferrer" className="font-semibold text-fosis-blue-800 hover:underline">
                             Visitar Sitio Oficial FOSIS
                         </a>
                     </p>

@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import type { Project, Disbursement, Rendition, SupervisedUser } from '../../types';
-import { TrashIcon, XCircleIcon } from '../Icons';
+import { TrashIcon, XCircleIcon, ChevronRightIcon } from '../Icons';
 
 // --- Helper Functions ---
 const formatDateForInput = (dateString?: string) => {
@@ -26,7 +25,23 @@ const addMonths = (date: string, months: number): string => {
 
 const formatCurrency = (value: number) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(value);
 
-// --- Component ---
+// --- Form Section Component for Accordion ---
+const FormSection: React.FC<{ title: string; children: React.ReactNode; defaultOpen?: boolean }> = ({ title, children, defaultOpen = false }) => {
+    return (
+        <details className="border border-slate-200 rounded-lg overflow-hidden group bg-white" open={defaultOpen}>
+            <summary className="p-4 font-semibold text-fosis-blue-800 cursor-pointer hover:bg-slate-50 flex justify-between items-center list-none">
+                {title}
+                <ChevronRightIcon className="w-5 h-5 text-slate-500 transition-transform group-open:rotate-90" />
+            </summary>
+            <div className="p-6 pt-2 border-t border-slate-200">
+                {children}
+            </div>
+        </details>
+    );
+};
+
+
+// --- Main Form Component ---
 interface ProjectFormProps {
     onClose: () => void;
     onSave: (project: Project) => void;
@@ -140,8 +155,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
         });
     };
     
-    // A map of functions to generate new, empty items for each list type.
-    // This makes adding new items more declarative and easier to maintain than a switch statement.
     const newItemTemplates: {
         disbursements: () => Disbursement;
         renditions: () => Rendition;
@@ -154,14 +167,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
 
     const addListItem = (listName: ListName) => {
         if (listName === 'disbursements' && project.disbursements.length >= 3) {
-            // Respect the business rule for max 3 disbursements
             return;
         }
         
         const newItem = newItemTemplates[listName]();
 
         setProject(prev => {
-            // Using a type assertion to help TypeScript understand the list type
             const list = prev[listName] as (Disbursement | Rendition | SupervisedUser)[];
             return {
                 ...prev,
@@ -218,157 +229,169 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
         };
         onSave(finalProject);
     };
+    
+    const inputClasses = (hasError: boolean) => 
+        `mt-1 block w-full border rounded-md shadow-soft-sm p-2 focus:outline-none focus:ring-2 focus:ring-fosis-blue-700/50 focus:border-fosis-blue-700 ${hasError ? 'border-red-500' : 'border-slate-300'}`;
+
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-                <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white z-10 rounded-t-lg">
-                    <h2 className="text-2xl font-bold text-fosis-blue-dark">{projectToEdit ? 'Editar' : 'Nuevo'} Proyecto</h2>
-                    <button onClick={onClose} className="text-neutral-400 hover:text-neutral-600">
+            <div className="bg-slate-50 rounded-2xl shadow-soft-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+                <div className="p-6 border-b border-slate-200 flex justify-between items-center sticky top-0 bg-slate-50 z-10 rounded-t-2xl">
+                    <h2 className="text-2xl font-bold text-fosis-blue-900">{projectToEdit ? 'Editar' : 'Nuevo'} Proyecto</h2>
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
                         <XCircleIcon className="w-8 h-8"/>
                     </button>
                 </div>
-                <form onSubmit={handleSubmit} className="p-6 overflow-y-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                        <div className="md:col-span-2"><h3 className="text-lg font-semibold text-neutral-800 mb-2 border-b pb-2">Información General</h3></div>
-                        <div>
-                            <label className="block text-sm font-medium text-neutral-700">Código del Proyecto</label>
-                            <input type="text" name="code" value={project.code} onChange={handleChange} placeholder="XX-XXXXXX-XXXXX-XX" className={`mt-1 block w-full border rounded-md shadow-sm p-2 ${errors.code ? 'border-red-500' : 'border-neutral-300'}`} required />
-                            {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-neutral-700">Nombre Ejecutor</label>
-                            <input type="text" name="executorName" value={project.executorName} onChange={handleChange} className={`mt-1 block w-full border rounded-md shadow-sm p-2 ${errors.executorName ? 'border-red-500' : 'border-neutral-300'}`} required />
-                             {errors.executorName && <p className="text-red-500 text-xs mt-1">{errors.executorName}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-neutral-700">Fecha Inicio</label>
-                            <input type="date" name="startDate" value={project.startDate} onChange={handleChange} className={`mt-1 block w-full border rounded-md shadow-sm p-2 ${errors.startDate ? 'border-red-500' : 'border-neutral-300'}`} required />
-                             {errors.startDate && <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>}
-                        </div>
-                         <div>
-                            <label className="block text-sm font-medium text-neutral-700">Duración (meses)</label>
-                            <input type="number" name="durationInMonths" value={project.durationInMonths || ''} onChange={handleChange} min="1" className={`mt-1 block w-full border rounded-md shadow-sm p-2 ${errors.durationInMonths ? 'border-red-500' : 'border-neutral-300'}`} required />
-                             {errors.durationInMonths && <p className="text-red-500 text-xs mt-1">{errors.durationInMonths}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-neutral-700">Fecha Término</label>
-                            <input type="date" name="endDate" value={project.endDate} disabled className="mt-1 block w-full border rounded-md shadow-sm p-2 bg-neutral-100" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-neutral-700">Fecha Término Contrato</label>
-                            <input type="date" name="contractEndDate" value={project.contractEndDate} disabled className="mt-1 block w-full border rounded-md shadow-sm p-2 bg-neutral-100" />
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-neutral-700">Monto Total Proyecto (CLP)</label>
-                            <input type="number" name="amount" value={project.amount || ''} onChange={handleChange} className={`mt-1 block w-full border rounded-md shadow-sm p-2 ${errors.amount ? 'border-red-500' : 'border-neutral-300'}`} required />
-                            {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount}</p>}
-                        </div>
-
-                        <div className="md:col-span-2 pt-4 mt-2"><h3 className="text-lg font-semibold text-neutral-800 mb-2 border-b pb-2">Garantías</h3></div>
-                        
-                        <div>
-                            <label className="block text-sm font-medium text-neutral-700">Valor UF del día</label>
-                            <input type="number" step="0.01" name="ufValue" value={project.ufValue || ''} onChange={handleChange} className={`mt-1 block w-full border rounded-md shadow-sm p-2 ${errors.ufValue ? 'border-red-500' : 'border-neutral-300'}`} required />
-                            {errors.ufValue && <p className="text-red-500 text-xs mt-1">{errors.ufValue}</p>}
-                        </div>
-                        <div />
-
-                        <div>
-                            <label className="block text-sm font-medium text-neutral-700">Monto G. Fiel Cumplimiento (UF)</label>
-                            <input type="number" step="0.01" name="complianceGuaranteeAmountUF" value={project.complianceGuaranteeAmountUF || ''} onChange={handleChange} className={`mt-1 block w-full border rounded-md shadow-sm p-2 ${errors.complianceGuaranteeAmountUF ? 'border-red-500' : 'border-neutral-300'}`} required />
-                            {project.ufValue > 0 && project.complianceGuaranteeAmountUF > 0 && <p className="text-sm text-neutral-500 mt-1">CLP: {formatCurrency(project.ufValue * project.complianceGuaranteeAmountUF)}</p>}
-                            {errors.complianceGuaranteeAmountUF && <p className="text-red-500 text-xs mt-1">{errors.complianceGuaranteeAmountUF}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-neutral-700">Vencimiento Sugerido G. F. C.</label>
-                            <input type="date" name="complianceGuaranteeDueDate" value={project.complianceGuaranteeDueDate} disabled className="mt-1 block w-full border rounded-md shadow-sm p-2 bg-neutral-100" />
-                        </div>
-                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-neutral-700">Vencimiento REAL G. Fiel Cumplimiento</label>
-                            <input type="date" name="complianceGuaranteeActualDueDate" value={project.complianceGuaranteeActualDueDate} onChange={handleChange} className={`mt-1 block w-full border rounded-md shadow-sm p-2 ${errors.complianceGuaranteeActualDueDate ? 'border-red-500' : 'border-neutral-300'}`} required />
-                            {errors.complianceGuaranteeActualDueDate && <p className="text-red-500 text-xs mt-1">{errors.complianceGuaranteeActualDueDate}</p>}
-                        </div>
-
-                        <div className="md:col-span-2 flex items-center gap-4 pt-4 mt-2">
-                             <label className="block text-sm font-medium text-neutral-700">Aplica Ley FOSIS (reemplaza garantía anticipo)</label>
-                             <input type="checkbox" name="isFosisLaw" checked={project.isFosisLaw} onChange={handleChange} className="h-5 w-5 text-fosis-blue rounded focus:ring-fosis-blue-light" />
-                        </div>
-                        {!project.isFosisLaw && (
-                           <>
+                <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
+                    
+                    <FormSection title="Información General" defaultOpen={true}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700">Monto G. Anticipo (UF)</label>
-                                <input type="number" step="0.01" name="advanceGuaranteeAmountUF" value={project.advanceGuaranteeAmountUF || ''} onChange={handleChange} className="mt-1 block w-full border border-neutral-300 rounded-md shadow-sm p-2" />
-                                {project.ufValue > 0 && (project.advanceGuaranteeAmountUF || 0) > 0 && <p className="text-sm text-neutral-500 mt-1">CLP: {formatCurrency(project.ufValue * (project.advanceGuaranteeAmountUF || 0))}</p>}
+                                <label className="block text-sm font-medium text-slate-700">Código del Proyecto</label>
+                                <input type="text" name="code" value={project.code} onChange={handleChange} placeholder="XX-XXXXXX-XXXXX-XX" className={inputClasses(!!errors.code)} required />
+                                {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700">Vencimiento Sugerido G. Anticipo</label>
-                                <input type="date" name="advanceGuaranteeEndDate" value={project.advanceGuaranteeEndDate} disabled className="mt-1 block w-full border rounded-md shadow-sm p-2 bg-neutral-100" />
+                                <label className="block text-sm font-medium text-slate-700">Nombre Ejecutor</label>
+                                <input type="text" name="executorName" value={project.executorName} onChange={handleChange} className={inputClasses(!!errors.executorName)} required />
+                                {errors.executorName && <p className="text-red-500 text-xs mt-1">{errors.executorName}</p>}
                             </div>
-                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-neutral-700">Vencimiento REAL G. Anticipo</label>
-                                <input type="date" name="advanceGuaranteeActualDueDate" value={project.advanceGuaranteeActualDueDate || ''} onChange={handleChange} className={`mt-1 block w-full border rounded-md shadow-sm p-2 ${errors.advanceGuaranteeActualDueDate ? 'border-red-500' : 'border-neutral-300'}`} />
-                                {errors.advanceGuaranteeActualDueDate && <p className="text-red-500 text-xs mt-1">{errors.advanceGuaranteeActualDueDate}</p>}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Fecha Inicio</label>
+                                <input type="date" name="startDate" value={project.startDate} onChange={handleChange} className={inputClasses(!!errors.startDate)} required />
+                                {errors.startDate && <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>}
                             </div>
-                           </>
-                        )}
-                        
-                        <div className="md:col-span-2 pt-4 mt-2"><h3 className="text-lg font-semibold text-neutral-800 mb-2 border-b pb-2">Gestión Financiera</h3></div>
-                        
-                        <div className="md:col-span-2">
-                            <h4 className="font-semibold text-neutral-700">Desembolsos</h4>
-                            {project.disbursements.map((d, i) => (
-                                <div key={d.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border rounded-md">
-                                    <input type="date" value={d.date} onChange={e => handleListChange('disbursements', i, 'date', e.target.value)} className="w-full border rounded-md shadow-sm p-2 border-neutral-300" />
-                                    <input type="number" placeholder="Monto CLP" value={d.amount || ''} onChange={e => handleListChange('disbursements', i, 'amount', parseFloat(e.target.value) || 0)} className="w-full border rounded-md shadow-sm p-2 border-neutral-300" />
-                                    <button type="button" onClick={() => removeListItem('disbursements', i)} className="text-red-500 hover:text-red-700 justify-self-end"><TrashIcon className="w-5 h-5"/></button>
-                                </div>
-                            ))}
-                             {project.disbursements.length < 3 && <button type="button" onClick={() => addListItem('disbursements')} className="mt-2 text-sm text-fosis-blue hover:underline">+ Agregar Desembolso (Máx 3)</button>}
-                             {errors.disbursements && <p className="text-red-500 text-xs mt-1">{errors.disbursements}</p>}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Duración (meses)</label>
+                                <input type="number" name="durationInMonths" value={project.durationInMonths || ''} onChange={handleChange} min="1" className={inputClasses(!!errors.durationInMonths)} required />
+                                {errors.durationInMonths && <p className="text-red-500 text-xs mt-1">{errors.durationInMonths}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Fecha Término</label>
+                                <input type="date" name="endDate" value={project.endDate} disabled className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 bg-slate-100 border-slate-300" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Fecha Término Contrato</label>
+                                <input type="date" name="contractEndDate" value={project.contractEndDate} disabled className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 bg-slate-100 border-slate-300" />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-slate-700">Monto Total Proyecto (CLP)</label>
+                                <input type="number" name="amount" value={project.amount || ''} onChange={handleChange} className={inputClasses(!!errors.amount)} required />
+                                {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount}</p>}
+                            </div>
                         </div>
+                    </FormSection>
 
-                        <div className="md:col-span-2">
-                            <h4 className="font-semibold text-neutral-700 mt-4">Rendiciones Aprobadas</h4>
-                             {project.renditions.map((r, i) => (
-                                <div key={r.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border rounded-md">
-                                    <input type="month" placeholder="Mes/Año" value={r.monthYear} onChange={e => handleListChange('renditions', i, 'monthYear', e.target.value)} className="w-full border rounded-md shadow-sm p-2 border-neutral-300" />
-                                    <input type="number" placeholder="Monto Aprobado CLP" value={r.approvedAmount || ''} onChange={e => handleListChange('renditions', i, 'approvedAmount', parseFloat(e.target.value) || 0)} className="w-full border rounded-md shadow-sm p-2 border-neutral-300" />
-                                    <button type="button" onClick={() => removeListItem('renditions', i)} className="text-red-500 hover:text-red-700 justify-self-end"><TrashIcon className="w-5 h-5"/></button>
+                    <FormSection title="Garantías">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Valor UF del día</label>
+                                <input type="number" step="0.01" name="ufValue" value={project.ufValue || ''} onChange={handleChange} className={inputClasses(!!errors.ufValue)} required />
+                                {errors.ufValue && <p className="text-red-500 text-xs mt-1">{errors.ufValue}</p>}
+                            </div>
+                            <div />
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Monto G. Fiel Cumplimiento (UF)</label>
+                                <input type="number" step="0.01" name="complianceGuaranteeAmountUF" value={project.complianceGuaranteeAmountUF || ''} onChange={handleChange} className={inputClasses(!!errors.complianceGuaranteeAmountUF)} required />
+                                {project.ufValue > 0 && project.complianceGuaranteeAmountUF > 0 && <p className="text-sm text-slate-500 mt-1">CLP: {formatCurrency(project.ufValue * project.complianceGuaranteeAmountUF)}</p>}
+                                {errors.complianceGuaranteeAmountUF && <p className="text-red-500 text-xs mt-1">{errors.complianceGuaranteeAmountUF}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700">Vencimiento Sugerido G. F. C.</label>
+                                <input type="date" name="complianceGuaranteeDueDate" value={project.complianceGuaranteeDueDate} disabled className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 bg-slate-100 border-slate-300" />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-slate-700">Vencimiento REAL G. Fiel Cumplimiento</label>
+                                <input type="date" name="complianceGuaranteeActualDueDate" value={project.complianceGuaranteeActualDueDate} onChange={handleChange} className={inputClasses(!!errors.complianceGuaranteeActualDueDate)} required />
+                                {errors.complianceGuaranteeActualDueDate && <p className="text-red-500 text-xs mt-1">{errors.complianceGuaranteeActualDueDate}</p>}
+                            </div>
+
+                            <div className="md:col-span-2 flex items-center gap-4 pt-4 mt-2">
+                                <label className="block text-sm font-medium text-slate-700">Aplica Ley FOSIS (reemplaza garantía anticipo)</label>
+                                <input type="checkbox" name="isFosisLaw" checked={project.isFosisLaw} onChange={handleChange} className="h-5 w-5 text-fosis-blue-800 rounded focus:ring-fosis-blue-200" />
+                            </div>
+                            {!project.isFosisLaw && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700">Monto G. Anticipo (UF)</label>
+                                    <input type="number" step="0.01" name="advanceGuaranteeAmountUF" value={project.advanceGuaranteeAmountUF || ''} onChange={handleChange} className={inputClasses(false)} />
+                                    {project.ufValue > 0 && (project.advanceGuaranteeAmountUF || 0) > 0 && <p className="text-sm text-slate-500 mt-1">CLP: {formatCurrency(project.ufValue * (project.advanceGuaranteeAmountUF || 0))}</p>}
                                 </div>
-                            ))}
-                            <button type="button" onClick={() => addListItem('renditions')} className="mt-2 text-sm text-fosis-blue hover:underline">+ Agregar Rendición</button>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700">Vencimiento Sugerido G. Anticipo</label>
+                                    <input type="date" name="advanceGuaranteeEndDate" value={project.advanceGuaranteeEndDate} disabled className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 bg-slate-100 border-slate-300" />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-slate-700">Vencimiento REAL G. Anticipo</label>
+                                    <input type="date" name="advanceGuaranteeActualDueDate" value={project.advanceGuaranteeActualDueDate || ''} onChange={handleChange} className={inputClasses(!!errors.advanceGuaranteeActualDueDate)} />
+                                    {errors.advanceGuaranteeActualDueDate && <p className="text-red-500 text-xs mt-1">{errors.advanceGuaranteeActualDueDate}</p>}
+                                </div>
+                            </>
+                            )}
                         </div>
-                        
-                        <div className="md:col-span-2 pt-4 mt-2"><h3 className="text-lg font-semibold text-neutral-800 mb-2 border-b pb-2">Personas Usuarias Supervisadas</h3></div>
-                        <div className="md:col-span-2 space-y-3">
+                    </FormSection>
+
+                    <FormSection title="Gestión Financiera">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                            <div className="md:col-span-2">
+                                <h4 className="font-semibold text-slate-700">Desembolsos</h4>
+                                {project.disbursements.map((d, i) => (
+                                    <div key={d.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border border-slate-200 rounded-md bg-slate-50/50">
+                                        <input type="date" value={d.date} onChange={e => handleListChange('disbursements', i, 'date', e.target.value)} className="w-full border rounded-md shadow-soft-sm p-2 border-slate-300" />
+                                        <input type="number" placeholder="Monto CLP" value={d.amount || ''} onChange={e => handleListChange('disbursements', i, 'amount', parseFloat(e.target.value) || 0)} className="w-full border rounded-md shadow-soft-sm p-2 border-slate-300" />
+                                        <button type="button" onClick={() => removeListItem('disbursements', i)} className="text-red-500 hover:text-red-700 justify-self-end p-1"><TrashIcon className="w-5 h-5"/></button>
+                                    </div>
+                                ))}
+                                {project.disbursements.length < 3 && <button type="button" onClick={() => addListItem('disbursements')} className="mt-2 text-sm text-fosis-blue-800 hover:underline">+ Agregar Desembolso (Máx 3)</button>}
+                                {errors.disbursements && <p className="text-red-500 text-xs mt-1">{errors.disbursements}</p>}
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <h4 className="font-semibold text-slate-700 mt-4">Rendiciones Aprobadas</h4>
+                                {project.renditions.map((r, i) => (
+                                    <div key={r.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border border-slate-200 rounded-md bg-slate-50/50">
+                                        <input type="month" placeholder="Mes/Año" value={r.monthYear} onChange={e => handleListChange('renditions', i, 'monthYear', e.target.value)} className="w-full border rounded-md shadow-soft-sm p-2 border-slate-300" />
+                                        <input type="number" placeholder="Monto Aprobado CLP" value={r.approvedAmount || ''} onChange={e => handleListChange('renditions', i, 'approvedAmount', parseFloat(e.target.value) || 0)} className="w-full border rounded-md shadow-soft-sm p-2 border-slate-300" />
+                                        <button type="button" onClick={() => removeListItem('renditions', i)} className="text-red-500 hover:text-red-700 justify-self-end p-1"><TrashIcon className="w-5 h-5"/></button>
+                                    </div>
+                                ))}
+                                <button type="button" onClick={() => addListItem('renditions')} className="mt-2 text-sm text-fosis-blue-800 hover:underline">+ Agregar Rendición</button>
+                            </div>
+                        </div>
+                    </FormSection>
+
+                    <FormSection title="Personas Usuarias Supervisadas">
+                        <div className="space-y-3">
                            {project.supervisedUsers.map((user, i) => (
-                               <div key={user.id} className="p-3 border rounded-lg grid grid-cols-1 sm:grid-cols-2 gap-4 relative bg-neutral-50">
-                                    <button type="button" onClick={() => removeListItem('supervisedUsers', i)} className="absolute top-2 right-2 text-red-500 hover:text-red-700"><TrashIcon className="w-5 h-5"/></button>
+                               <div key={user.id} className="p-3 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-2 gap-4 relative bg-slate-100/50">
+                                    <button type="button" onClick={() => removeListItem('supervisedUsers', i)} className="absolute top-2 right-2 text-red-500 hover:text-red-700 p-1"><TrashIcon className="w-5 h-5"/></button>
                                    <div>
-                                       <label className="block text-sm font-medium text-neutral-700">Fecha Supervisión</label>
-                                       <input type="date" value={user.supervisionDate} onChange={e => handleListChange('supervisedUsers', i, 'supervisionDate', e.target.value)} className="mt-1 block w-full border rounded-md shadow-sm p-2 border-neutral-300"/>
+                                       <label className="block text-sm font-medium text-slate-700">Fecha Supervisión</label>
+                                       <input type="date" value={user.supervisionDate} onChange={e => handleListChange('supervisedUsers', i, 'supervisionDate', e.target.value)} className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 border-slate-300"/>
                                    </div>
                                     <div>
-                                       <label className="block text-sm font-medium text-neutral-700">Nombre Completo</label>
-                                       <input type="text" placeholder="Nombre de la persona" value={user.name} onChange={e => handleListChange('supervisedUsers', i, 'name', e.target.value)} className="mt-1 block w-full border rounded-md shadow-sm p-2 border-neutral-300"/>
+                                       <label className="block text-sm font-medium text-slate-700">Nombre Completo</label>
+                                       <input type="text" placeholder="Nombre de la persona" value={user.name} onChange={e => handleListChange('supervisedUsers', i, 'name', e.target.value)} className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 border-slate-300"/>
                                    </div>
                                     <div>
-                                       <label className="block text-sm font-medium text-neutral-700">Comuna</label>
-                                       <input type="text" placeholder="Comuna" value={user.commune} onChange={e => handleListChange('supervisedUsers', i, 'commune', e.target.value)} className="mt-1 block w-full border rounded-md shadow-sm p-2 border-neutral-300"/>
+                                       <label className="block text-sm font-medium text-slate-700">Comuna</label>
+                                       <input type="text" placeholder="Comuna" value={user.commune} onChange={e => handleListChange('supervisedUsers', i, 'commune', e.target.value)} className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 border-slate-300"/>
                                    </div>
                                     <div className="sm:col-span-2">
-                                       <label className="block text-sm font-medium text-neutral-700">Observación</label>
-                                       <textarea value={user.observation} onChange={e => handleListChange('supervisedUsers', i, 'observation', e.target.value)} rows={2} className="mt-1 block w-full border rounded-md shadow-sm p-2 border-neutral-300"></textarea>
+                                       <label className="block text-sm font-medium text-slate-700">Observación</label>
+                                       <textarea value={user.observation} onChange={e => handleListChange('supervisedUsers', i, 'observation', e.target.value)} rows={2} className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 border-slate-300"></textarea>
                                    </div>
                                </div>
                            ))}
-                           <button type="button" onClick={() => addListItem('supervisedUsers')} className="mt-2 text-sm text-fosis-blue hover:underline">+ Agregar Persona</button>
+                           <button type="button" onClick={() => addListItem('supervisedUsers')} className="mt-2 text-sm text-fosis-blue-800 hover:underline">+ Agregar Persona</button>
                         </div>
-                    </div>
-                    <div className="mt-8 pt-6 border-t flex justify-end gap-4">
-                        <button type="button" onClick={onClose} className="px-6 py-2 bg-neutral-200 text-neutral-800 font-semibold rounded-lg hover:bg-neutral-300 transition-colors">Cancelar</button>
-                        <button type="submit" className="px-6 py-2 bg-fosis-blue text-white font-semibold rounded-lg hover:bg-fosis-blue-dark shadow-md transition-all">Guardar Proyecto</button>
+                    </FormSection>
+                    
+                    <div className="mt-6 pt-4 border-t border-slate-200 flex justify-end gap-4">
+                        <button type="button" onClick={onClose} className="px-6 py-2 bg-slate-200 text-slate-800 font-semibold rounded-lg hover:bg-slate-300 transition-colors">Cancelar</button>
+                        <button type="submit" className="px-6 py-2 bg-fosis-blue-800 text-white font-semibold rounded-lg hover:bg-fosis-blue-900 shadow-soft-md transition-all">Guardar Proyecto</button>
                     </div>
                 </form>
             </div>
