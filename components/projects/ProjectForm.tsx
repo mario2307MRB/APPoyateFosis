@@ -140,26 +140,33 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
         });
     };
     
+    // A map of functions to generate new, empty items for each list type.
+    // This makes adding new items more declarative and easier to maintain than a switch statement.
+    const newItemTemplates: {
+        disbursements: () => Disbursement;
+        renditions: () => Rendition;
+        supervisedUsers: () => SupervisedUser;
+    } = {
+        disbursements: () => ({ id: crypto.randomUUID(), date: '', amount: 0 }),
+        renditions: () => ({ id: crypto.randomUUID(), monthYear: '', approvedAmount: 0 }),
+        supervisedUsers: () => ({ id: crypto.randomUUID(), supervisionDate: '', name: '', commune: '', observation: '' })
+    };
+
     const addListItem = (listName: ListName) => {
-        if (listName === 'disbursements' && project.disbursements.length >= 3) return;
+        if (listName === 'disbursements' && project.disbursements.length >= 3) {
+            // Respect the business rule for max 3 disbursements
+            return;
+        }
+        
+        const newItem = newItemTemplates[listName]();
 
         setProject(prev => {
-            switch(listName) {
-                case 'disbursements': {
-                    const newItem: Disbursement = { id: crypto.randomUUID(), date: '', amount: 0 };
-                    return { ...prev, disbursements: [...prev.disbursements, newItem] };
-                }
-                case 'renditions': {
-                    const newItem: Rendition = { id: crypto.randomUUID(), monthYear: '', approvedAmount: 0 };
-                    return { ...prev, renditions: [...prev.renditions, newItem] };
-                }
-                case 'supervisedUsers': {
-                    const newItem: SupervisedUser = { id: crypto.randomUUID(), supervisionDate: '', name: '', commune: '', observation: '' };
-                     return { ...prev, supervisedUsers: [...prev.supervisedUsers, newItem] };
-                }
-                default:
-                    return prev;
-            }
+            // Using a type assertion to help TypeScript understand the list type
+            const list = prev[listName] as (Disbursement | Rendition | SupervisedUser)[];
+            return {
+                ...prev,
+                [listName]: [...list, newItem],
+            };
         });
     };
 

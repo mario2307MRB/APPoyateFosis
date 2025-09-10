@@ -34,7 +34,17 @@ const AccordionSection: React.FC<{ title: string; children: React.ReactNode }> =
 
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onDelete }) => {
-    const formatDate = (dateString?: string) => dateString ? new Date(dateString).toLocaleDateString('es-CL', {timeZone: 'UTC'}) : 'N/A';
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return 'N/A';
+        // The date from the form is already YYYY-MM-DD, which new Date() interprets as UTC.
+        // Adding timeZone: 'UTC' ensures consistency regardless of browser implementation.
+        return new Date(dateString).toLocaleDateString('es-CL', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            timeZone: 'UTC'
+        });
+    };
 
     const getDateStatusClass = (actualDateStr?: string, suggestedDateStr?: string): string => {
         if (!actualDateStr || !suggestedDateStr) return 'text-neutral-600';
@@ -69,7 +79,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onDelete }) 
 
                 <div className="mt-4"><strong>Monto Total:</strong> {formatCurrency(project.amount)}</div>
 
-                <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-neutral-600">
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm text-neutral-600">
                     <div><strong>Inicio:</strong> {formatDate(project.startDate)}</div>
                     <div><strong>Término:</strong> {formatDate(project.endDate)}</div>
                 </div>
