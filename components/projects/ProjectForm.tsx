@@ -28,12 +28,12 @@ const formatCurrency = (value: number) => new Intl.NumberFormat('es-CL', { style
 // --- Form Section Component for Accordion ---
 const FormSection: React.FC<{ title: string; children: React.ReactNode; defaultOpen?: boolean }> = ({ title, children, defaultOpen = false }) => {
     return (
-        <details className="border border-slate-200 rounded-lg overflow-hidden group bg-white" open={defaultOpen}>
-            <summary className="p-4 font-semibold text-fosis-blue-800 cursor-pointer hover:bg-slate-50 flex justify-between items-center list-none">
+        <details className="border border-slate-200/80 dark:border-slate-700/80 rounded-lg overflow-hidden group bg-white/70 dark:bg-slate-800/50" open={defaultOpen}>
+            <summary className="p-4 font-semibold text-fosis-blue-800 dark:text-fosis-blue-300 cursor-pointer hover:bg-slate-500/5 flex justify-between items-center list-none">
                 {title}
                 <ChevronRightIcon className="w-5 h-5 text-slate-500 transition-transform group-open:rotate-90" />
             </summary>
-            <div className="p-6 pt-2 border-t border-slate-200">
+            <div className="p-6 pt-2 border-t border-slate-200/80 dark:border-slate-700/80">
                 {children}
             </div>
         </details>
@@ -231,15 +231,15 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
     };
     
     const inputClasses = (hasError: boolean) => 
-        `mt-1 block w-full border rounded-md shadow-soft-sm p-2 focus:outline-none focus:ring-2 focus:ring-fosis-blue-700/50 focus:border-fosis-blue-700 ${hasError ? 'border-red-500' : 'border-slate-300'}`;
+        `mt-1 block w-full border rounded-md shadow-soft-sm p-2 focus:outline-none focus:ring-2 focus:ring-fosis-blue-700/50 bg-white/70 dark:bg-slate-700/70 text-slate-800 dark:text-slate-100 ${hasError ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'}`;
 
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-50 rounded-2xl shadow-soft-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-                <div className="p-6 border-b border-slate-200 flex justify-between items-center sticky top-0 bg-slate-50 z-10 rounded-t-2xl">
-                    <h2 className="text-2xl font-bold text-fosis-blue-900">{projectToEdit ? 'Editar' : 'Nuevo'} Proyecto</h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+        <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-50 dark:bg-slate-900/90 backdrop-blur-2xl rounded-2xl shadow-soft-xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-white/20 dark:border-slate-700/50">
+                <div className="p-6 border-b border-slate-200 dark:border-slate-700/80 flex justify-between items-center sticky top-0 z-10 rounded-t-2xl">
+                    <h2 className="text-2xl font-bold text-fosis-blue-900 dark:text-white">{projectToEdit ? 'Editar' : 'Nuevo'} Proyecto</h2>
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                         <XCircleIcon className="w-8 h-8"/>
                     </button>
                 </div>
@@ -248,85 +248,76 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
                     <FormSection title="Información General" defaultOpen={true}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700">Código del Proyecto</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Código del Proyecto</label>
                                 <input type="text" name="code" value={project.code} onChange={handleChange} placeholder="XX-XXXXXX-XXXXX-XX" className={inputClasses(!!errors.code)} required />
                                 {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700">Nombre Ejecutor</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Nombre Ejecutor</label>
                                 <input type="text" name="executorName" value={project.executorName} onChange={handleChange} className={inputClasses(!!errors.executorName)} required />
-                                {errors.executorName && <p className="text-red-500 text-xs mt-1">{errors.executorName}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700">Fecha Inicio</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Fecha Inicio</label>
                                 <input type="date" name="startDate" value={project.startDate} onChange={handleChange} className={inputClasses(!!errors.startDate)} required />
-                                {errors.startDate && <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700">Duración (meses)</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Duración (meses)</label>
                                 <input type="number" name="durationInMonths" value={project.durationInMonths || ''} onChange={handleChange} min="1" className={inputClasses(!!errors.durationInMonths)} required />
-                                {errors.durationInMonths && <p className="text-red-500 text-xs mt-1">{errors.durationInMonths}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700">Fecha Término</label>
-                                <input type="date" name="endDate" value={project.endDate} disabled className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 bg-slate-100 border-slate-300" />
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Fecha Término</label>
+                                <input type="date" name="endDate" value={project.endDate} disabled className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700">Fecha Término Contrato</label>
-                                <input type="date" name="contractEndDate" value={project.contractEndDate} disabled className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 bg-slate-100 border-slate-300" />
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Fecha Término Contrato</label>
+                                <input type="date" name="contractEndDate" value={project.contractEndDate} disabled className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600" />
                             </div>
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-slate-700">Monto Total Proyecto (CLP)</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Monto Total Proyecto (CLP)</label>
                                 <input type="number" name="amount" value={project.amount || ''} onChange={handleChange} className={inputClasses(!!errors.amount)} required />
-                                {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount}</p>}
                             </div>
                         </div>
                     </FormSection>
 
                     <FormSection title="Garantías">
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700">Valor UF del día</label>
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-slate-700 dark:text-slate-200">
+                             <div>
+                                <label className="block text-sm font-medium">Valor UF del día</label>
                                 <input type="number" step="0.01" name="ufValue" value={project.ufValue || ''} onChange={handleChange} className={inputClasses(!!errors.ufValue)} required />
-                                {errors.ufValue && <p className="text-red-500 text-xs mt-1">{errors.ufValue}</p>}
                             </div>
                             <div />
-
                             <div>
-                                <label className="block text-sm font-medium text-slate-700">Monto G. Fiel Cumplimiento (UF)</label>
+                                <label className="block text-sm font-medium">Monto G. Fiel Cumplimiento (UF)</label>
                                 <input type="number" step="0.01" name="complianceGuaranteeAmountUF" value={project.complianceGuaranteeAmountUF || ''} onChange={handleChange} className={inputClasses(!!errors.complianceGuaranteeAmountUF)} required />
-                                {project.ufValue > 0 && project.complianceGuaranteeAmountUF > 0 && <p className="text-sm text-slate-500 mt-1">CLP: {formatCurrency(project.ufValue * project.complianceGuaranteeAmountUF)}</p>}
-                                {errors.complianceGuaranteeAmountUF && <p className="text-red-500 text-xs mt-1">{errors.complianceGuaranteeAmountUF}</p>}
+                                {project.ufValue > 0 && project.complianceGuaranteeAmountUF > 0 && <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">CLP: {formatCurrency(project.ufValue * project.complianceGuaranteeAmountUF)}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700">Vencimiento Sugerido G. F. C.</label>
-                                <input type="date" name="complianceGuaranteeDueDate" value={project.complianceGuaranteeDueDate} disabled className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 bg-slate-100 border-slate-300" />
+                                <label className="block text-sm font-medium">Vencimiento Sugerido G. F. C.</label>
+                                <input type="date" name="complianceGuaranteeDueDate" value={project.complianceGuaranteeDueDate} disabled className="mt-1 block w-full border rounded-md p-2 bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600" />
                             </div>
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-slate-700">Vencimiento REAL G. Fiel Cumplimiento</label>
+                                <label className="block text-sm font-medium">Vencimiento REAL G. Fiel Cumplimiento</label>
                                 <input type="date" name="complianceGuaranteeActualDueDate" value={project.complianceGuaranteeActualDueDate} onChange={handleChange} className={inputClasses(!!errors.complianceGuaranteeActualDueDate)} required />
-                                {errors.complianceGuaranteeActualDueDate && <p className="text-red-500 text-xs mt-1">{errors.complianceGuaranteeActualDueDate}</p>}
                             </div>
 
                             <div className="md:col-span-2 flex items-center gap-4 pt-4 mt-2">
-                                <label className="block text-sm font-medium text-slate-700">Aplica Ley FOSIS (reemplaza garantía anticipo)</label>
+                                <label className="block text-sm font-medium">Aplica Ley FOSIS (reemplaza garantía anticipo)</label>
                                 <input type="checkbox" name="isFosisLaw" checked={project.isFosisLaw} onChange={handleChange} className="h-5 w-5 text-fosis-blue-800 rounded focus:ring-fosis-blue-200" />
                             </div>
                             {!project.isFosisLaw && (
                             <>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700">Monto G. Anticipo (UF)</label>
+                                    <label className="block text-sm font-medium">Monto G. Anticipo (UF)</label>
                                     <input type="number" step="0.01" name="advanceGuaranteeAmountUF" value={project.advanceGuaranteeAmountUF || ''} onChange={handleChange} className={inputClasses(false)} />
-                                    {project.ufValue > 0 && (project.advanceGuaranteeAmountUF || 0) > 0 && <p className="text-sm text-slate-500 mt-1">CLP: {formatCurrency(project.ufValue * (project.advanceGuaranteeAmountUF || 0))}</p>}
+                                    {project.ufValue > 0 && (project.advanceGuaranteeAmountUF || 0) > 0 && <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">CLP: {formatCurrency(project.ufValue * (project.advanceGuaranteeAmountUF || 0))}</p>}
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700">Vencimiento Sugerido G. Anticipo</label>
-                                    <input type="date" name="advanceGuaranteeEndDate" value={project.advanceGuaranteeEndDate} disabled className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 bg-slate-100 border-slate-300" />
+                                    <label className="block text-sm font-medium">Vencimiento Sugerido G. Anticipo</label>
+                                    <input type="date" name="advanceGuaranteeEndDate" value={project.advanceGuaranteeEndDate} disabled className="mt-1 block w-full border rounded-md p-2 bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600" />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-slate-700">Vencimiento REAL G. Anticipo</label>
+                                    <label className="block text-sm font-medium">Vencimiento REAL G. Anticipo</label>
                                     <input type="date" name="advanceGuaranteeActualDueDate" value={project.advanceGuaranteeActualDueDate || ''} onChange={handleChange} className={inputClasses(!!errors.advanceGuaranteeActualDueDate)} />
-                                    {errors.advanceGuaranteeActualDueDate && <p className="text-red-500 text-xs mt-1">{errors.advanceGuaranteeActualDueDate}</p>}
                                 </div>
                             </>
                             )}
@@ -334,62 +325,35 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onSave, projectToEdi
                     </FormSection>
 
                     <FormSection title="Gestión Financiera">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                            <div className="md:col-span-2">
-                                <h4 className="font-semibold text-slate-700">Desembolsos</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-slate-700 dark:text-slate-200">
+                             <div className="md:col-span-2">
+                                <h4 className="font-semibold">Desembolsos</h4>
+                                {errors.disbursements && <p className="text-red-500 text-xs mt-1">{errors.disbursements}</p>}
                                 {project.disbursements.map((d, i) => (
-                                    <div key={d.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border border-slate-200 rounded-md bg-slate-50/50">
-                                        <input type="date" value={d.date} onChange={e => handleListChange('disbursements', i, 'date', e.target.value)} className="w-full border rounded-md shadow-soft-sm p-2 border-slate-300" />
-                                        <input type="number" placeholder="Monto CLP" value={d.amount || ''} onChange={e => handleListChange('disbursements', i, 'amount', parseFloat(e.target.value) || 0)} className="w-full border rounded-md shadow-soft-sm p-2 border-slate-300" />
+                                    <div key={d.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border border-slate-200 dark:border-slate-700 rounded-md bg-slate-500/10">
+                                        <input type="date" value={d.date} onChange={e => handleListChange('disbursements', i, 'date', e.target.value)} className={inputClasses(false)} />
+                                        <input type="number" placeholder="Monto CLP" value={d.amount || ''} onChange={e => handleListChange('disbursements', i, 'amount', parseFloat(e.target.value) || 0)} className={inputClasses(false)} />
                                         <button type="button" onClick={() => removeListItem('disbursements', i)} className="text-red-500 hover:text-red-700 justify-self-end p-1"><TrashIcon className="w-5 h-5"/></button>
                                     </div>
                                 ))}
-                                {project.disbursements.length < 3 && <button type="button" onClick={() => addListItem('disbursements')} className="mt-2 text-sm text-fosis-blue-800 hover:underline">+ Agregar Desembolso (Máx 3)</button>}
-                                {errors.disbursements && <p className="text-red-500 text-xs mt-1">{errors.disbursements}</p>}
+                                {project.disbursements.length < 3 && <button type="button" onClick={() => addListItem('disbursements')} className="mt-2 text-sm text-fosis-blue-800 dark:text-fosis-blue-300 hover:underline">+ Agregar Desembolso (Máx 3)</button>}
                             </div>
 
                             <div className="md:col-span-2">
-                                <h4 className="font-semibold text-slate-700 mt-4">Rendiciones Aprobadas</h4>
+                                <h4 className="font-semibold mt-4">Rendiciones Aprobadas</h4>
                                 {project.renditions.map((r, i) => (
-                                    <div key={r.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border border-slate-200 rounded-md bg-slate-50/50">
-                                        <input type="month" placeholder="Mes/Año" value={r.monthYear} onChange={e => handleListChange('renditions', i, 'monthYear', e.target.value)} className="w-full border rounded-md shadow-soft-sm p-2 border-slate-300" />
-                                        <input type="number" placeholder="Monto Aprobado CLP" value={r.approvedAmount || ''} onChange={e => handleListChange('renditions', i, 'approvedAmount', parseFloat(e.target.value) || 0)} className="w-full border rounded-md shadow-soft-sm p-2 border-slate-300" />
+                                    <div key={r.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center mt-2 p-2 border border-slate-200 dark:border-slate-700 rounded-md bg-slate-500/10">
+                                        <input type="month" placeholder="Mes/Año" value={r.monthYear} onChange={e => handleListChange('renditions', i, 'monthYear', e.target.value)} className={inputClasses(false)} />
+                                        <input type="number" placeholder="Monto Aprobado CLP" value={r.approvedAmount || ''} onChange={e => handleListChange('renditions', i, 'approvedAmount', parseFloat(e.target.value) || 0)} className={inputClasses(false)} />
                                         <button type="button" onClick={() => removeListItem('renditions', i)} className="text-red-500 hover:text-red-700 justify-self-end p-1"><TrashIcon className="w-5 h-5"/></button>
                                     </div>
                                 ))}
-                                <button type="button" onClick={() => addListItem('renditions')} className="mt-2 text-sm text-fosis-blue-800 hover:underline">+ Agregar Rendición</button>
+                                <button type="button" onClick={() => addListItem('renditions')} className="mt-2 text-sm text-fosis-blue-800 dark:text-fosis-blue-300 hover:underline">+ Agregar Rendición</button>
                             </div>
                         </div>
                     </FormSection>
-
-                    <FormSection title="Personas Usuarias Supervisadas">
-                        <div className="space-y-3">
-                           {project.supervisedUsers.map((user, i) => (
-                               <div key={user.id} className="p-3 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-2 gap-4 relative bg-slate-100/50">
-                                    <button type="button" onClick={() => removeListItem('supervisedUsers', i)} className="absolute top-2 right-2 text-red-500 hover:text-red-700 p-1"><TrashIcon className="w-5 h-5"/></button>
-                                   <div>
-                                       <label className="block text-sm font-medium text-slate-700">Fecha Supervisión</label>
-                                       <input type="date" value={user.supervisionDate} onChange={e => handleListChange('supervisedUsers', i, 'supervisionDate', e.target.value)} className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 border-slate-300"/>
-                                   </div>
-                                    <div>
-                                       <label className="block text-sm font-medium text-slate-700">Nombre Completo</label>
-                                       <input type="text" placeholder="Nombre de la persona" value={user.name} onChange={e => handleListChange('supervisedUsers', i, 'name', e.target.value)} className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 border-slate-300"/>
-                                   </div>
-                                    <div>
-                                       <label className="block text-sm font-medium text-slate-700">Comuna</label>
-                                       <input type="text" placeholder="Comuna" value={user.commune} onChange={e => handleListChange('supervisedUsers', i, 'commune', e.target.value)} className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 border-slate-300"/>
-                                   </div>
-                                    <div className="sm:col-span-2">
-                                       <label className="block text-sm font-medium text-slate-700">Observación</label>
-                                       <textarea value={user.observation} onChange={e => handleListChange('supervisedUsers', i, 'observation', e.target.value)} rows={2} className="mt-1 block w-full border rounded-md shadow-soft-sm p-2 border-slate-300"></textarea>
-                                   </div>
-                               </div>
-                           ))}
-                           <button type="button" onClick={() => addListItem('supervisedUsers')} className="mt-2 text-sm text-fosis-blue-800 hover:underline">+ Agregar Persona</button>
-                        </div>
-                    </FormSection>
                     
-                    <div className="mt-6 pt-4 border-t border-slate-200 flex justify-end gap-4">
+                    <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700/80 flex justify-end gap-4">
                         <button type="button" onClick={onClose} className="px-6 py-2 bg-slate-200 text-slate-800 font-semibold rounded-lg hover:bg-slate-300 transition-colors">Cancelar</button>
                         <button type="submit" className="px-6 py-2 bg-fosis-blue-800 text-white font-semibold rounded-lg hover:bg-fosis-blue-900 shadow-soft-md transition-all">Guardar Proyecto</button>
                     </div>

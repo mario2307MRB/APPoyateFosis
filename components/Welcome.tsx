@@ -1,166 +1,90 @@
-import React, { useState, useEffect } from 'react';
-import { FOSIS_TIPS, formatCurrency } from '../constants';
-import type { User, Project } from '../types';
-import { ChevronLeftIcon, ChevronRightIcon } from './Icons';
-import useLocalStorage from '../hooks/useLocalStorage';
-import Dashboard from './Dashboard';
+import React from 'react';
+import type { User, AppView } from '../types';
+import { ProjectIcon, QuizIcon, TaskIcon, ConsultIcon, ChevronRightIcon } from './Icons';
+import useProgress from '../hooks/useProgress';
 
-// --- ProjectsCarousel Component defined within Welcome.tsx ---
-const ProjectsCarousel: React.FC = React.memo(() => {
-    const [projects] = useLocalStorage<Project[]>('fosis_projects', []);
-    const [currentIndex, setCurrentIndex] = useState(0);
-
-    const recentProjects = [...projects]
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, 5); // Show up to 5 recent projects
-
-    const nextProject = () => {
-        if (recentProjects.length === 0) return;
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % recentProjects.length);
-    };
-
-    const prevProject = () => {
-        if (recentProjects.length === 0) return;
-        setCurrentIndex((prevIndex) => (prevIndex - 1 + recentProjects.length) % recentProjects.length);
-    };
-
-    useEffect(() => {
-        if (recentProjects.length <= 1) return;
-        const timer = setInterval(() => {
-            nextProject();
-        }, 7000); // Change project every 7 seconds
-        return () => clearInterval(timer);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [recentProjects.length]);
-
-    if (projects.length === 0) {
-        return null; // Don't show anything if there are no projects at all
-    }
-
-    return (
-        <div className="w-full max-w-3xl mx-auto mt-12">
-            <h2 className="text-2xl font-bold text-slate-700 mb-4 text-center">Proyectos Recientes</h2>
-            <div className="relative bg-white rounded-2xl shadow-soft-lg overflow-hidden border border-slate-200">
-                <div className="relative h-56 flex items-center justify-center transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
-                    {recentProjects.map((project) => {
-                         const totalDisbursed = project.disbursements?.reduce((sum, d) => sum + d.amount, 0) || 0;
-                         const totalRendered = project.renditions?.reduce((sum, r) => sum + r.approvedAmount, 0) || 0;
-                         const percentageRendered = totalDisbursed > 0 ? (totalRendered / totalDisbursed) * 100 : 0;
-
-                        return (
-                        <div key={project.id} className="w-full flex-shrink-0 p-6 md:p-8 text-left box-border">
-                            <p className="text-sm font-semibold text-fosis-blue-800">{project.code}</p>
-                            <h3 className="text-xl font-bold text-fosis-blue-900 truncate" title={project.executorName}>{project.executorName}</h3>
-                            <p className="mt-2 text-slate-600"><strong>Monto:</strong> {formatCurrency(project.amount)}</p>
-                            
-                            <div className="mt-4">
-                              <div className="flex justify-between mb-1 text-sm">
-                                <span className="font-medium text-fosis-blue-900">% Rendido</span>
-                                <span className="font-medium text-fosis-blue-900">{percentageRendered.toFixed(1)}%</span>
-                              </div>
-                              <div className="w-full bg-slate-200 rounded-full h-3.5">
-                                <div className="bg-gradient-to-r from-fosis-green-500 to-fosis-green-400 h-3.5 rounded-full transition-all duration-500" style={{ width: `${percentageRendered > 100 ? 100 : percentageRendered}%` }}></div>
-                              </div>
-                            </div>
-                        </div>
-                    )})}
-                </div>
-
-                {recentProjects.length > 1 && (
-                    <>
-                        <button onClick={prevProject} className="absolute top-1/2 left-3 -translate-y-1/2 bg-white/70 hover:bg-white backdrop-blur-sm rounded-full p-2 transition shadow-soft-md hover:scale-110">
-                            <ChevronLeftIcon className="w-6 h-6 text-fosis-blue-800" />
-                        </button>
-                        <button onClick={nextProject} className="absolute top-1/2 right-3 -translate-y-1/2 bg-white/70 hover:bg-white backdrop-blur-sm rounded-full p-2 transition shadow-soft-md hover:scale-110">
-                            <ChevronRightIcon className="w-6 h-6 text-fosis-blue-800" />
-                        </button>
-
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-                            {recentProjects.map((_, index) => (
-                                <button key={index} aria-label={`Ir al proyecto ${index + 1}`} onClick={() => setCurrentIndex(index)} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${currentIndex === index ? 'bg-fosis-blue-800 scale-125' : 'bg-slate-300 hover:bg-slate-400'}`}></button>
-                            ))}
-                        </div>
-                    </>
-                )}
-            </div>
-        </div>
-    );
-});
-
-
-// --- TipsCarousel Component defined within Welcome.tsx ---
-const TipsCarousel: React.FC = React.memo(() => {
-    const [currentIndex, setCurrentIndex] = useState(0);
-
-    const nextTip = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % FOSIS_TIPS.length);
-    };
-
-    const prevTip = () => {
-        setCurrentIndex((prevIndex) => (prevIndex - 1 + FOSIS_TIPS.length) % FOSIS_TIPS.length);
-    };
-
-    useEffect(() => {
-        const timer = setInterval(() => {
-            nextTip();
-        }, 5000); // Change tip every 5 seconds
-        return () => clearInterval(timer);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    return (
-        <div className="relative w-full max-w-2xl mx-auto mt-10 bg-fosis-green-100 border border-fosis-green-500/30 rounded-2xl shadow-soft-lg overflow-hidden">
-            <div className="relative h-48 flex items-center justify-center transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
-                {FOSIS_TIPS.map((tip) => (
-                    <div key={tip.id} className="w-full flex-shrink-0 p-8 text-center">
-                        <h3 className="text-xl font-bold text-fosis-green-700">{tip.title}</h3>
-                        <p className="mt-2 text-slate-600">{tip.content}</p>
-                    </div>
-                ))}
-            </div>
-
-            <button onClick={prevTip} className="absolute top-1/2 left-3 -translate-y-1/2 bg-white/70 hover:bg-white backdrop-blur-sm rounded-full p-2 transition shadow-soft-md hover:scale-110">
-                <ChevronLeftIcon className="w-6 h-6 text-fosis-green-700" />
-            </button>
-            <button onClick={nextTip} className="absolute top-1/2 right-3 -translate-y-1/2 bg-white/70 hover:bg-white backdrop-blur-sm rounded-full p-2 transition shadow-soft-md hover:scale-110">
-                <ChevronRightIcon className="w-6 h-6 text-fosis-green-700" />
-            </button>
-
-             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-                {FOSIS_TIPS.map((_, index) => (
-                    <button key={index} aria-label={`Ir al tip ${index + 1}`} onClick={() => setCurrentIndex(index)} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${currentIndex === index ? 'bg-fosis-green-700 scale-125' : 'bg-slate-300 hover:bg-slate-400'}`}></button>
-                ))}
-            </div>
-        </div>
-    );
-});
-
-// --- Main Welcome Component ---
 interface WelcomeProps {
     user: User;
+    setView: (view: AppView) => void;
 }
 
-const Welcome: React.FC<WelcomeProps> = ({ user }) => {
-    return (
-        <div className="w-full flex flex-col items-center p-4 sm:p-6 lg:p-8">
-            <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-soft-xl w-full max-w-4xl mx-auto text-center border border-slate-200 bg-gradient-to-br from-fosis-blue-50/40 via-white to-white">
-                <img src="https://www.fosis.gob.cl/assets/img/logo_main.png" alt="Logo FOSIS" className="mx-auto h-20 mb-6"/>
-                <h1 className="text-4xl md:text-5xl font-extrabold text-fosis-blue-900 tracking-tight">
-                    Bienvenido al Gestor de Proyectos
-                </h1>
-                <p className="mt-4 text-2xl text-slate-700">
-                    Hola, <span className="font-semibold text-fosis-green-600">{user.email}</span>
-                </p>
-                <p className="mt-2 text-lg text-slate-500 max-w-2xl mx-auto">
-                    Esta es tu plataforma centralizada para administrar, consultar y optimizar tus proyectos FOSIS.
-                </p>
-                
-                <Dashboard />
+interface NavCardProps {
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+    onClick: () => void;
+    colorClasses: string;
+}
 
-                <ProjectsCarousel />
-                
-                <TipsCarousel />
+const NavCard: React.FC<NavCardProps> = React.memo(({ icon, title, description, onClick, colorClasses }) => (
+    <button
+        onClick={onClick}
+        className={`group relative text-left p-6 rounded-3xl overflow-hidden transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl focus:outline-none focus-visible:ring-4 ring-offset-2 dark:ring-offset-slate-900 ${colorClasses}`}
+        aria-label={`Ir a ${title}`}
+    >
+        <div className="relative z-10">
+            <div className="mb-4 p-3 bg-white/30 rounded-full w-max">
+                {icon}
             </div>
+            <h3 className="text-2xl font-bold text-white drop-shadow-sm">{title}</h3>
+            <p className="mt-1 text-white/80 drop-shadow-sm">{description}</p>
+        </div>
+        <div className="absolute bottom-4 right-4 text-white/50 group-hover:text-white group-hover:scale-125 transition-all duration-300">
+            <ChevronRightIcon className="w-8 h-8"/>
+        </div>
+        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-300"></div>
+    </button>
+));
+
+
+const Welcome: React.FC<WelcomeProps> = ({ user, setView }) => {
+    const progress = useProgress();
+
+    return (
+        <div className="w-full flex flex-col items-center p-4 sm:p-6 lg:p-8 animate-fade-in-up">
+            <div className="w-full max-w-6xl mx-auto text-center">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 dark:text-white tracking-tight">
+                    Bienvenido, <span className="text-fosis-blue-800 dark:text-fosis-blue-400">{user.email.split('@')[0]}</span>
+                </h1>
+                <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+                    Tu centro de mando para la gestión de proyectos FOSIS. Selecciona un módulo para comenzar.
+                </p>
+                <div className="mt-4 text-lg font-bold text-fosis-green-600 dark:text-fosis-green-400">
+                    Puntaje de Progreso: {progress}
+                </div>
+            </div>
+
+             <div className="w-full max-w-6xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+                <NavCard 
+                    title="Mis Proyectos"
+                    description="Gestiona y supervisa tus convenios."
+                    icon={<ProjectIcon className="w-8 h-8 text-white"/>}
+                    onClick={() => setView('projects')}
+                    colorClasses="bg-gradient-to-br from-fosis-blue-700 to-sky-500 ring-fosis-blue-500"
+                />
+                 <NavCard 
+                    title="Quiz FOSIS"
+                    description="Pon a prueba tus conocimientos."
+                    icon={<QuizIcon className="w-8 h-8 text-white"/>}
+                    onClick={() => setView('quiz')}
+                    colorClasses="bg-gradient-to-br from-fosis-green-600 to-emerald-400 ring-fosis-green-500"
+                />
+                 <NavCard 
+                    title="Gestor de Tareas"
+                    description="Organiza tu semana y optimiza tu tiempo."
+                    icon={<TaskIcon className="w-8 h-8 text-white"/>}
+                    onClick={() => setView('tasks')}
+                    colorClasses="bg-gradient-to-br from-amber-500 to-orange-500 ring-amber-500"
+                />
+                 <NavCard 
+                    title="Consulta en Línea"
+                    description="Resuelve tus dudas con el asistente IA."
+                    icon={<ConsultIcon className="w-8 h-8 text-white"/>}
+                    onClick={() => setView('consultation')}
+                    colorClasses="bg-gradient-to-br from-purple-600 to-indigo-500 ring-purple-500"
+                />
+            </div>
+
         </div>
     );
 };

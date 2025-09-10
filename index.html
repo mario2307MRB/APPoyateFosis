@@ -16,6 +16,15 @@
   }
 }
 </script>
+<script>
+    // Establece el tema al cargar inicialmente para prevenir el "FOUC" (Flash Of Unstyled Content)
+    // Esto asegura que la app respete el modo oscuro del sistema desde el primer render.
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
 </head>
   <body>
     <div id="root"></div>

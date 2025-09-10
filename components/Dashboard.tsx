@@ -1,19 +1,69 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 import type { Project } from '../types';
 import { formatCurrency } from '../constants';
 import { ArchiveIcon, DollarSignIcon, TrendingUpIcon } from './Icons';
 
+// --- Animated Number Component ---
+const AnimatedNumber: React.FC<{ value: number; format: 'currency' | 'percentage' | 'integer' }> = React.memo(({ value, format }) => {
+    const [displayValue, setDisplayValue] = useState(0);
+
+    useEffect(() => {
+        let start = displayValue;
+        const end = value;
+        
+        // If the value hasn't changed, do nothing.
+        if (start === end) return;
+
+        const duration = 1200;
+        const startTime = performance.now();
+
+        const animate = (currentTime: number) => {
+            const elapsedTime = currentTime - startTime;
+            const progress = Math.min(elapsedTime / duration, 1);
+            // Ease out function
+            const easedProgress = 1 - Math.pow(1 - progress, 3);
+            const currentVal = start + easedProgress * (end - start);
+            
+            setDisplayValue(currentVal);
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                setDisplayValue(end); // Ensure it ends on the exact value
+            }
+        };
+
+        requestAnimationFrame(animate);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [value]);
+    
+    let formattedValue = '';
+    if (format === 'currency') {
+        formattedValue = formatCurrency(displayValue);
+    } else if (format === 'percentage') {
+        formattedValue = `${displayValue.toFixed(1)}%`;
+    } else {
+        formattedValue = Math.round(displayValue).toLocaleString('es-CL');
+    }
+
+    return <>{formattedValue}</>;
+});
+
+
 // --- Reusable Components ---
 
-const KpiCard: React.FC<{ title: string; value: string; icon: React.ReactNode }> = React.memo(({ title, value, icon }) => (
-    <div className="bg-white p-6 rounded-2xl shadow-soft-lg border border-slate-200 flex items-center gap-5">
+const KpiCard: React.FC<{ title: string; value: number; icon: React.ReactNode, format: 'currency' | 'percentage' | 'integer' }> = React.memo(({ title, value, icon, format }) => (
+    <div className="bg-white p-6 rounded-2xl shadow-soft-lg border border-slate-200 flex items-center gap-5 transition-all duration-300 hover:shadow-soft-xl hover:-translate-y-1">
         <div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center bg-fosis-blue-100 text-fosis-blue-800">
             {icon}
         </div>
         <div>
             <p className="text-sm text-slate-500 font-medium">{title}</p>
-            <p className="text-2xl font-bold text-slate-800">{value}</p>
+            <p className="text-2xl font-bold text-slate-800">
+                <AnimatedNumber value={value} format={format} />
+            </p>
         </div>
     </div>
 ));
@@ -54,8 +104,8 @@ const FinancialDonutChart: React.FC<{ data: { rendered: number; toRender: number
             <div className="relative w-48 h-48 flex-shrink-0">
                 <svg viewBox="0 0 200 200" className="-rotate-90">
                     <circle cx="100" cy="100" r={innerRadius} fill="transparent" strokeWidth={strokeWidth} className="text-slate-200" stroke="currentColor" />
-                    <circle cx="100" cy="100" r={innerRadius} fill="transparent" strokeWidth={strokeWidth} className="text-fosis-green-500" stroke="currentColor" strokeDasharray={`${renderedStroke} ${circumference}`} strokeDashoffset={renderedOffset} strokeLinecap="round" style={{ transition: 'stroke-dasharray 0.5s' }}><title>Rendido: {formatCurrency(rendered)}</title></circle>
-                    <circle cx="100" cy="100" r={innerRadius} fill="transparent" strokeWidth={strokeWidth} className="text-yellow-500" stroke="currentColor" strokeDasharray={`${toRenderStroke} ${circumference}`} strokeDashoffset={toRenderOffset} strokeLinecap="round" style={{ transition: 'all 0.5s' }}><title>Por Rendir: {formatCurrency(toRender)}</title></circle>
+                    <circle cx="100" cy="100" r={innerRadius} fill="transparent" strokeWidth={strokeWidth} className="text-fosis-green-500" stroke="currentColor" strokeDasharray={`${renderedStroke} ${circumference}`} strokeDashoffset={renderedOffset} strokeLinecap="round" style={{ transition: 'stroke-dasharray 0.8s ease-out' }}><title>Rendido: {formatCurrency(rendered)}</title></circle>
+                    <circle cx="100" cy="100" r={innerRadius} fill="transparent" strokeWidth={strokeWidth} className="text-yellow-500" stroke="currentColor" strokeDasharray={`${toRenderStroke} ${circumference}`} strokeDashoffset={toRenderOffset} strokeLinecap="round" style={{ transition: 'all 0.8s ease-out' }}><title>Por Rendir: {formatCurrency(toRender)}</title></circle>
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                     <span className="text-xs text-slate-500">Total</span>
@@ -91,6 +141,20 @@ const ProjectStatusBarChart: React.FC<{ data: { onTime: number; atRisk: number; 
 
     const maxValue = Math.max(...chartData.map(d => d.value), 1);
 
+    const [barWidths, setBarWidths] = useState<{ [key: string]: number }>({});
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const newWidths = {
+                'A Tiempo': (onTime / maxValue) * 100,
+                'En Riesgo': (atRisk / maxValue) * 100,
+                'Vencidas': (overdue / maxValue) * 100,
+            };
+            setBarWidths(newWidths);
+        }, 100);
+        return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data, maxValue]);
+
     return (
         <div className="space-y-4">
             {chartData.map(item => (
@@ -99,8 +163,8 @@ const ProjectStatusBarChart: React.FC<{ data: { onTime: number; atRisk: number; 
                     <div className="col-span-3 flex items-center gap-2">
                         <div className="w-full bg-slate-100 rounded-full h-6">
                             <div
-                                className={`${item.color} h-6 rounded-full transition-all duration-500`}
-                                style={{ width: `${(item.value / maxValue) * 100}%` }}
+                                className={`${item.color} h-6 rounded-full transition-all duration-700 ease-out`}
+                                style={{ width: `${barWidths[item.label] || 0}%` }}
                             ></div>
                         </div>
                         <span className={`font-bold w-8 text-right ${item.text}`}>{item.value}</span>
@@ -162,7 +226,7 @@ const Dashboard: React.FC = () => {
 
     if (projects.length === 0) {
         return (
-            <div className="mt-8 text-center p-8 bg-fosis-blue-100 rounded-2xl border-2 border-dashed border-fosis-blue-800/30">
+            <div className="mt-8 text-center p-8 bg-fosis-blue-100/60 rounded-2xl border-2 border-dashed border-fosis-blue-800/30">
                 <h2 className="text-xl font-semibold text-fosis-blue-900">¡Bienvenido a tu Panel de Control!</h2>
                 <p className="text-slate-600 mt-2">Agrega tu primer proyecto para ver tus estadísticas y gráficos aquí.</p>
             </div>
@@ -173,9 +237,9 @@ const Dashboard: React.FC = () => {
         <div className="mt-10 text-left">
             <h2 className="text-2xl font-bold text-fosis-blue-900 mb-4 text-center">Panel de Control Global</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <KpiCard title="Total de Proyectos" value={dashboardData.projectCount.toString()} icon={<ArchiveIcon className="w-6 h-6"/>} />
-                <KpiCard title="Monto Total Gestionado" value={formatCurrency(dashboardData.totalAmount)} icon={<DollarSignIcon className="w-6 h-6"/>} />
-                <KpiCard title="% Rendición Global" value={`${dashboardData.renditionPercentage.toFixed(1)}%`} icon={<TrendingUpIcon className="w-6 h-6"/>} />
+                <KpiCard title="Total de Proyectos" value={dashboardData.projectCount} format="integer" icon={<ArchiveIcon className="w-6 h-6"/>} />
+                <KpiCard title="Monto Total Gestionado" value={dashboardData.totalAmount} format="currency" icon={<DollarSignIcon className="w-6 h-6"/>} />
+                <KpiCard title="% Rendición Global" value={dashboardData.renditionPercentage} format="percentage" icon={<TrendingUpIcon className="w-6 h-6"/>} />
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                  <ChartCard title="Resumen Financiero Global">
