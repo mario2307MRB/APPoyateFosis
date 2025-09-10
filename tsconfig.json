@@ -21,29 +21,16 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": [
-    "node_modules",
-    "vite.config.ts",
-    "tsconfig.node.json",
-    "tailwind.config.js",
-    "index.tsx",
-    "index.css",
-    "App.tsx",
-    "constants.ts",
-    "types.ts",
-    "hooks",
-    "services",
-    "components/Auth.tsx",
-    "components/AvatarCompanion.tsx",
-    "components/Consultation.tsx",
-    "components/Dashboard.tsx",
-    "components/DynamicBackground.tsx",
-    "components/Icons.tsx",
-    "components/Projects.tsx",
-    "components/Quiz.tsx",
-    "components/TaskManager.tsx",
-    "components/Welcome.tsx",
-    "components/projects"
-  ]
+  "include": [
+    "next-env.d.ts",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "components/header.tsx",
+    "components/footer.tsx",
+    "components/ui/**/*.ts",
+    "components/ui/**/*.tsx",
+    "lib/**/*.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
 }
