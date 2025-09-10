@@ -2,7 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, Users, HeartHandshake, Leaf } from "lucide-react";
-import { motion } from "framer-motion";
+// FIX: Imported Variants type from framer-motion to resolve typing issues.
+import { motion, type Variants } from "framer-motion";
 
 const programData = [
   {
@@ -45,7 +46,8 @@ const testimonialsData = [
     }
 ]
 
-const containerVariants = {
+// FIX: Explicitly typed framer-motion variants to resolve typing issues.
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -55,7 +57,8 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+// FIX: Explicitly typed framer-motion variants to resolve typing issues.
+const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
     y: 0,

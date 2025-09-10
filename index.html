@@ -1,19 +1,83 @@
-<script type="importmap">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="https://www.fosis.gob.cl/assets/img/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestor de Proyectos FOSIS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script type="importmap">
 {
   "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.395.0",
+    "framer-motion": "https://esm.sh/framer-motion@11.2.10",
+    "clsx": "https://esm.sh/clsx@2.1.1",
+    "tailwind-merge": "https://esm.sh/tailwind-merge@2.3.0",
+    "@radix-ui/react-slot": "https://esm.sh/@radix-ui/react-slot@1.0.2",
+    "class-variance-authority": "https://esm.sh/class-variance-authority@0.7.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
     "tailwindcss": "https://aistudiocdn.com/tailwindcss@^4.1.13",
     "tailwindcss-animate": "https://aistudiocdn.com/tailwindcss-animate@^1.0.7",
-    "clsx": "https://aistudiocdn.com/clsx@^2.1.1",
-    "tailwind-merge": "https://aistudiocdn.com/tailwind-merge@^3.3.1",
-    "next": "https://aistudiocdn.com/next@^15.5.2",
-    "next/": "https://aistudiocdn.com/next@^15.5.2/",
-    "@radix-ui/react-slot": "https://aistudiocdn.com/@radix-ui/react-slot@^1.2.3",
-    "class-variance-authority": "https://aistudiocdn.com/class-variance-authority@^0.7.1",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.543.0",
-    "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.12",
-    "react": "https://aistudiocdn.com/react@^19.1.1",
-    "react/": "https://aistudiocdn.com/react@^19.1.1/"
+    "next": "https://aistudiocdn.com/next@^15.5.3",
+    "next/": "https://aistudiocdn.com/next@^15.5.3/"
   }
 }
 </script>
-<!-- This file is intentionally left blank to prevent conflicts with the Next.js application. -->
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              'fosis-blue': { 50: '#eef6ff', 100: '#d9eaff', 200: '#badcff', 300: '#91c7ff', 400: '#60aaff', 500: '#3b8eff', 600: '#1d6ef2', 700: '#1a59de', 800: '#0D47A1', 900: '#173b82', 950: '#112650' },
+              'fosis-green': { 50: '#f0fdf8', 100: '#dcfce9', 200: '#bbf7d5', 300: '#86efb8', 400: '#4ade8f', 500: '#10B981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' },
+              border: "hsl(214.3, 31.8%, 91.4%)",
+              input: "hsl(214.3, 31.8%, 91.4%)",
+              ring: "hsl(215, 85%, 35%)",
+              background: "hsl(0, 0%, 100%)",
+              foreground: "hsl(222.2, 84%, 4.9%)",
+              primary: { DEFAULT: "hsl(215, 85%, 35%)", foreground: "hsl(210, 40%, 98%)" },
+              secondary: { DEFAULT: "hsl(210, 40%, 96.1%)", foreground: "hsl(222.2, 47.4%, 11.2%)" },
+              destructive: { DEFAULT: "hsl(0, 84.2%, 60.2%)", foreground: "hsl(210, 40%, 98%)" },
+              muted: { DEFAULT: "hsl(210, 40%, 96.1%)", foreground: "hsl(215.4, 16.3%, 46.9%)" },
+              accent: { DEFAULT: "hsl(145, 74%, 40%)", foreground: "hsl(210, 40%, 98%)" },
+              popover: { DEFAULT: "hsl(0, 0%, 100%)", foreground: "hsl(222.2, 84%, 4.9%)" },
+              card: { DEFAULT: "hsl(0, 0%, 100%)", foreground: "hsl(222.2, 84%, 4.9%)" },
+            },
+            borderRadius: { lg: "0.5rem", md: "calc(0.5rem - 2px)", sm: "calc(0.5rem - 4px)" },
+            keyframes: {
+              "accordion-down": { from: { height: "0" }, to: { height: "var(--radix-accordion-content-height)" } },
+              "accordion-up": { from: { height: "var(--radix-accordion-content-height)" }, to: { height: "0" } },
+              "gradient-pan": {
+                '0%': { backgroundPosition: '0% 50%' },
+                '50%': { backgroundPosition: '100% 50%' },
+                '100%': { backgroundPosition: '0% 50%' },
+              }
+            },
+            animation: {
+              "accordion-down": "accordion-down 0.2s ease-out",
+              "accordion-up": "accordion-up 0.2s ease-out",
+              "gradient-pan": "gradient-pan 25s ease infinite",
+            },
+          }
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="./index.css" />
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
+</body>
+</html>
