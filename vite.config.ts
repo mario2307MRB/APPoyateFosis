@@ -1,1 +1,1 @@
-// This file is intentionally left blank to prevent conflicts with the Next.js application.
+// This file is for a Vite project and is not used by Next.js.
