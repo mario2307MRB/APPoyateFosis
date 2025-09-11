@@ -1,15 +1,25 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Briefcase, Users, HeartHandshake, Leaf, Quote } from "lucide-react";
-import { motion, type Variants } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Briefcase, Users, HeartHandshake, Leaf, Quote, type LucideProps } from "lucide-react";
+import React, { useState, useEffect } from 'react';
 
-const programData = [
-  { icon: <Briefcase className="h-8 w-8 text-primary group-hover:text-white transition-colors" />, title: "Yo Emprendo", description: "Apoyo a personas que quieren iniciar o fortalecer un pequeño negocio." },
-  { icon: <Users className="h-8 w-8 text-primary group-hover:text-white transition-colors" />, title: "Apoyo Familiar", description: "Acompañamiento integral para familias en situación de vulnerabilidad." },
-  { icon: <HeartHandshake className="h-8 w-8 text-primary group-hover:text-white transition-colors" />, title: "Acción", description: "Financiamiento para proyectos de organizaciones sociales y comunitarias." },
-  { icon: <Leaf className="h-8 w-8 text-primary group-hover:text-white transition-colors" />, title: "Autoconsumo", description: "Iniciativas para que familias produzcan sus propios alimentos de forma sostenible." },
-];
+// Type for program data from API
+interface Program {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+// Map icon names from API to actual components
+const iconMap: { [key: string]: React.FC<LucideProps> } = {
+  Briefcase: Briefcase,
+  Users: Users,
+  HeartHandshake: HeartHandshake,
+  Leaf: Leaf,
+};
 
 const testimonialsData = [
     { quote: "Gracias al FOSIS pude comprar las herramientas que necesitaba para mi taller. Mi negocio ha crecido y ahora puedo darle una mejor vida a mi familia.", name: "María González", program: "Yo Emprendo, Valparaíso" },
@@ -17,23 +27,78 @@ const testimonialsData = [
     { quote: "Como junta de vecinos, logramos mejorar la plaza de nuestro barrio con el fondo del programa Acción. Ahora los niños tienen un lugar seguro para jugar.", name: "Ana Silva", program: "Acción, Coquimbo" }
 ];
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
-};
-
-const itemVariants: Variants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } },
-};
-
 export default function HomePage() {
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const response = await fetch('/api/programs');
+        if (!response.ok) {
+          throw new Error('Error al cargar los programas');
+        }
+        const data = await response.json();
+        setPrograms(data);
+      } catch (err) {
+        setError('No se pudieron cargar los programas en este momento. Por favor, intente más tarde.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrograms();
+  }, []);
+
+  const renderProgramCards = () => {
+    if (loading) {
+      return Array.from({ length: 4 }).map((_, index) => (
+        <div key={index}>
+            <Card className="h-full text-center">
+              <CardHeader className="items-center">
+                <Skeleton className="h-16 w-16 rounded-full" />
+                <Skeleton className="h-6 w-32 mt-4" />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-4/5 mx-auto" />
+              </CardContent>
+            </Card>
+        </div>
+      ));
+    }
+
+    if (error) {
+      return <p className="col-span-full text-center text-destructive">{error}</p>;
+    }
+
+    return programs.map((program) => {
+        const ProgramIcon = iconMap[program.icon] || Briefcase;
+        return (
+            <div key={program.id} className="group">
+                <Card className="h-full text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-transparent hover:border-primary">
+                    <CardHeader className="items-center">
+                        <div className="bg-secondary p-4 rounded-full group-hover:bg-primary transition-all duration-300 group-hover:scale-110">
+                            <ProgramIcon className="h-8 w-8 text-primary group-hover:text-white transition-colors" />
+                        </div>
+                        <CardTitle className="mt-4">{program.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground">{program.description}</p>
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    });
+  };
+  
   return (
     <>
       {/* Hero Section */}
       <section className="bg-secondary/50 overflow-hidden">
         <div className="container grid lg:grid-cols-2 gap-12 items-center py-20 md:py-32">
-          <motion.div className="space-y-6" initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, ease: "easeOut" }}>
+          <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tighter text-fosis-blue-800">
               <span className="bg-clip-text text-transparent bg-gradient-to-br from-fosis-blue-800 to-fosis-green-700">
                 Construyendo Oportunidades
@@ -46,17 +111,14 @@ export default function HomePage() {
               <Button size="lg" variant="accent">Postula Aquí</Button>
               <Button size="lg" variant="outline">Conoce Nuestros Programas</Button>
             </div>
-          </motion.div>
-          <motion.div className="relative" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}>
-            <motion.div
-              animate={{ y: ["0%", "-3%", "0%"] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            >
+          </div>
+          <div className="relative">
+            <div>
               <div className="bg-background rounded-lg p-2 shadow-2xl border overflow-hidden ring-1 ring-primary/10">
                 <img src="https://www.fosis.gob.cl/uploads/noticias_1024x536_65f47d3e0b2eb.jpeg" alt="Persona beneficiaria de FOSIS" className="rounded-md object-cover aspect-video" />
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -69,23 +131,9 @@ export default function HomePage() {
               Ofrecemos distintos programas de apoyo enfocados en el emprendimiento, la habitabilidad y el fortalecimiento comunitario.
             </p>
           </div>
-          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
-            {programData.map((program, index) => (
-              <motion.div key={index} variants={itemVariants} className="group">
-                <Card className="h-full text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-transparent hover:border-primary">
-                  <CardHeader className="items-center">
-                    <div className="bg-secondary p-4 rounded-full group-hover:bg-primary transition-all duration-300 group-hover:scale-110">
-                      {program.icon}
-                    </div>
-                    <CardTitle className="mt-4">{program.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{program.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {renderProgramCards()}
+          </div>
         </div>
       </section>
 
@@ -98,9 +146,9 @@ export default function HomePage() {
               Historias reales de esfuerzo y superación que nos inspiran a seguir trabajando.
             </p>
           </div>
-          <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonialsData.map((testimonial, index) => (
-              <motion.div key={index} variants={itemVariants}>
+              <div key={index}>
                 <Card className="h-full flex flex-col justify-between relative overflow-hidden bg-background/80 backdrop-blur-sm">
                    <Quote className="absolute -top-4 -left-4 h-24 w-24 text-secondary opacity-60" />
                   <CardContent className="pt-8 flex-1 z-10">
@@ -111,9 +159,9 @@ export default function HomePage() {
                     <p className="text-sm font-medium text-primary">{testimonial.program}</p>
                   </CardHeader>
                 </Card>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
     </>

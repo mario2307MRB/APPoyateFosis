@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
-import { motion } from 'framer-motion';
 
 const navItems = [
     { label: "Programas", href: "#programas" },
@@ -43,12 +42,7 @@ const Header = () => {
                 </div>
             </div>
             {isMenuOpen && (
-                 <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="md:hidden bg-background border-t"
-                >
+                 <div className="md:hidden bg-background border-t">
                     <nav className="flex flex-col items-center gap-4 p-4">
                         {navItems.map((item) => (
                             <a
@@ -64,7 +58,7 @@ const Header = () => {
                             Acceso Usuarios
                         </Button>
                     </nav>
-                </motion.div>
+                </div>
             )}
         </header>
     );
